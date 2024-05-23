@@ -42,6 +42,27 @@ Import-Module -Name "本程序目录的绝对路径"
 Import-Module PowerJekyll
 ```
 
+## 关于config.yml
+
+`config.yml`中可以配置博客的格式头`yaml fomatter`，在使用`post`、`draft`命令时，会使用配置的格式头初始化文档
+
+```yaml
+# yaml formatter
+formatter:
+  draft:
+    layout: post
+    title:
+    categories: []
+    tags: []
+
+  post:
+    layout: post
+    title:
+    categories: []
+    tags: []
+    date:  
+```
+
 ## 使用示例
 
 下面是一些使用示例：
