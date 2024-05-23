@@ -1,0 +1,16 @@
+# yaml formatter
+formatter:
+  draft:
+    layout: post
+    title:
+    categories: []
+    tags: []
+    typora-root-url: ./..
+
+  post:
+    layout: post
+    title:
+    categories: []
+    tags: []
+    typora-root-url: ./..
+    date:  # use current time automatically if there is no value
