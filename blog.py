@@ -142,6 +142,7 @@ class Blog:
             f.write('---\n')
             f.write(yaml_formatter)
             f.write('---\n')
+        print(f'{os.path.join(self.post_dir, filename)} created as post.')
 
     def draft(self):
         filename: str = self.args.filename
@@ -167,6 +168,7 @@ class Blog:
             f.write('---\n')
             f.write(yaml_formatter)
             f.write('---\n')
+        print(f'{os.path.join(self.draft_dir, filename)} created as draft.')
 
     def publish(self):
         filename: str = self.args.filename
@@ -192,6 +194,7 @@ class Blog:
 
         # remove the draft file
         os.remove(src_file)
+        print(f'Draft "{src_file}"\npublished as "{dest_file}"')
 
     def unpublish(self):
         filename: str = self.args.filename
@@ -223,3 +226,4 @@ class Blog:
         self.__write_yaml_formatter(dest_file, yaml_formatter, article)
 
         os.remove(src_file)
+        print(f'Post "{src_file}"\nunpublished as "{dest_file}"')
