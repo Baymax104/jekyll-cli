@@ -1,10 +1,13 @@
 # -*- coding: UTF-8 -*-
 import argparse
 import importlib
+import inspect
 import os
 
 import argcomplete
 from ruamel import yaml
+
+from command import Command
 
 
 class BlogParser(object):
@@ -18,14 +21,28 @@ class BlogParser(object):
         with open('../config.yml', 'r') as f:
             config = yaml.safe_load(f)
 
-        # import commands dynamically
-        for filename in os.listdir('commands'):
-            if filename.endswith('.py'):
-                module = importlib.import_module(f'commands.{filename[:-3]}')
-                for name in dir(module):
-                    cls = getattr(module, name)
-                    if isinstance(cls, type):
+        # import basic commands
+        self.__import_basic_commands(subparsers, root_dir, config)
+
+        # import git commands
+        self.__import_extra_commands('git_commands', subparsers, root_dir, config)
+
+    @staticmethod
+    def __import_basic_commands(subparsers, root_dir, config):
+        for script in os.listdir('commands'):
+            if script.endswith('.py'):
+                module = importlib.import_module(f'commands.{script[:-3]}')
+                for name, cls in inspect.getmembers(module):
+                    if name != 'Command' and inspect.isclass(cls) and issubclass(cls, Command):
                         cls(subparsers, root_dir, config)
+
+    @staticmethod
+    def __import_extra_commands(module_name, subparsers, root_dir, config):
+        module = importlib.import_module(module_name)
+        if hasattr(module, 'init'):
+            init = getattr(module, 'init')
+            if callable(init):
+                init(subparsers, root_dir, config)
 
     def parse(self):
         argcomplete.autocomplete(self.parser)

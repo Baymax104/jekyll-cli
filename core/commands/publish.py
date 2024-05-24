@@ -2,17 +2,14 @@
 import os
 import time
 
+from command import Command
 from utils import get_file_completer, write_markdown, format_print, read_markdown
 
 
-class PublishCommand(object):
+class PublishCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        self.root_dir = root_dir
-        self.post_dir = os.path.join(root_dir, '_posts')
-        self.draft_dir = os.path.join(root_dir, '_drafts')
-        self.config = config
-
+        super().__init__(subparsers, root_dir, config)
         self.parser = subparsers.add_parser('publish', help='publish a draft.', aliases=['pub'])
         publish_action = self.parser.add_argument('filename', help='draft filename in _drafts.', type=str)
         publish_action.completer = get_file_completer(root_dir, 'draft')

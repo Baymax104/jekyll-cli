@@ -1,17 +1,14 @@
 # -*- coding: UTF-8 -*-
 import os
 
+from command import Command
 from utils import format_print
 
 
-class ListCommand(object):
+class ListCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        self.root_dir = root_dir
-        self.post_dir = os.path.join(root_dir, '_posts')
-        self.draft_dir = os.path.join(root_dir, '_drafts')
-        self.config = config
-
+        super().__init__(subparsers, root_dir, config)
         self.parser = subparsers.add_parser('list', help='list all posts and drafts.', aliases=['l'])
         self.parser.add_argument('-d', '--draft', help='list all drafts.', action='store_true')
         self.parser.add_argument('-p', '--post', help='list all posts.', action='store_true')

@@ -2,17 +2,14 @@
 import fnmatch
 import os
 
+from command import Command
 from utils import get_file_completer
 
 
-class OpenCommand(object):
+class OpenCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        self.root_dir = root_dir
-        self.post_dir = os.path.join(root_dir, '_posts')
-        self.draft_dir = os.path.join(root_dir, '_drafts')
-        self.config = config
-
+        super().__init__(subparsers, root_dir, config)
         self.parser = subparsers.add_parser('open', help='open post or draft in editor.', aliases=['o'])
         open_action = self.parser.add_argument('filename', help='post or draft filename.', type=str)
         open_action.completer = get_file_completer(root_dir, 'both')

@@ -3,14 +3,14 @@ import os
 
 from ruamel import yaml
 
+from command import Command
 
-class DraftCommand(object):
+
+class DraftCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        self.root_dir = root_dir
-        self.config = config
+        super().__init__(subparsers, root_dir, config)
         self.draft_formatter = config['formatter']['draft']
-        self.draft_dir = os.path.join(root_dir, '_drafts')
 
         self.parser = subparsers.add_parser('draft', help='create a draft in _drafts.', aliases=['d'])
         self.parser.add_argument('filename', help='draft filename.', type=str)

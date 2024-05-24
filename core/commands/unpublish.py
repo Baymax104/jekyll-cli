@@ -2,17 +2,14 @@
 import fnmatch
 import os
 
+from command import Command
 from utils import get_file_completer, write_markdown, read_markdown, format_print
 
 
-class UnpublishCommand(object):
+class UnpublishCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        self.root_dir = root_dir
-        self.post_dir = os.path.join(root_dir, '_posts')
-        self.draft_dir = os.path.join(root_dir, '_drafts')
-        self.config = config
-
+        super().__init__(subparsers, root_dir, config)
         self.parser = subparsers.add_parser('unpublish', help='unpublish a post in _posts.', aliases=['unpub'])
         unpublish_action = self.parser.add_argument('filename', help='post filename in _posts.', type=str)
         unpublish_action.completer = get_file_completer(root_dir, 'post')

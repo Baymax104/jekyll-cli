@@ -4,13 +4,13 @@ import time
 
 from ruamel import yaml
 
+from command import Command
 
-class PostCommand(object):
+
+class PostCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        self.root_dir = root_dir
-        self.post_dir = os.path.join(root_dir, '_posts')
-        self.config = config
+        super().__init__(subparsers, root_dir, config)
         self.post_formatter = config['formatter']['post']
 
         self.parser = subparsers.add_parser('post', help='create a post in _posts.', aliases=['p'])

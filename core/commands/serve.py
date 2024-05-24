@@ -2,12 +2,13 @@
 
 import os
 
+from command import Command
 
-class ServeCommand(object):
+
+class ServeCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        self.root_dir = root_dir
-        self.config = config
+        super().__init__(subparsers, root_dir, config)
         self.parser = subparsers.add_parser('serve', help='start blog server locally through jekyll.', aliases=['s'])
         self.parser.add_argument('-d', '--draft', help='start blog server with drafts.', action='store_true')
         self.parser.set_defaults(execute=self.execute)
