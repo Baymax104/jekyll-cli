@@ -35,6 +35,7 @@ class BlogArgumentParser:
         draft_parser.add_argument('-t', '--title', help='draft title.', type=str)
         draft_parser.add_argument('-c', '--cats', help='draft categories.', nargs='*')
         draft_parser.add_argument('-T', '--tags', help='draft tags.',  nargs='*')
+        draft_parser.add_argument('-o', '--open', help='open draft.', action='store_true')
 
         # post command parser
         post_parser = subparsers.add_parser('post', help='create a post in _posts.', aliases=['p'])
@@ -42,6 +43,21 @@ class BlogArgumentParser:
         post_parser.add_argument('-t', '--title', help='post title.', type=str)
         post_parser.add_argument('-c', '--cats', help='post categories.', nargs='*')
         post_parser.add_argument('-T', '--tags', help='post tags.',  nargs='*')
+        post_parser.add_argument('-o', '--open', help='open post.', action='store_true')
+
+        # do command parser
+        do_parser = subparsers.add_parser('do', help='create a draft and open it.')
+        do_parser.add_argument('filename', help='draft filename.', type=str)
+        do_parser.add_argument('-t', '--title', help='draft title.', type=str)
+        do_parser.add_argument('-c', '--cats', help='draft categories.', nargs='*')
+        do_parser.add_argument('-T', '--tags', help='draft tags.', nargs='*')
+
+        # po command parser
+        po_parser = subparsers.add_parser('po', help='create a post and open it.')
+        po_parser.add_argument('filename', help='post filename.', type=str)
+        po_parser.add_argument('-t', '--title', help='post title.', type=str)
+        po_parser.add_argument('-c', '--cats', help='post categories.', nargs='*')
+        po_parser.add_argument('-T', '--tags', help='post tags.', nargs='*')
 
         # publish command parser
         publish_parser = subparsers.add_parser('publish', help='publish a draft.', aliases=['pub'])

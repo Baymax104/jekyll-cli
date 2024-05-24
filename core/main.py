@@ -44,6 +44,10 @@ def main():
         blog.publish()
     elif args.command == 'unpublish' or args.command == 'unpub':
         blog.unpublish()
+    elif args.command == 'do':
+        blog.draft_open()
+    elif args.command == 'po':
+        blog.post_open()
     else:
         parser.help()
 

@@ -27,7 +27,7 @@ class Blog:
         self.root_dir = root_dir
         self.post_dir = os.path.join(root_dir, '_posts')
         self.draft_dir = os.path.join(root_dir, '_drafts')
-        with open('config.yml', 'r') as f:
+        with open('../config.yml', 'r') as f:
             config = yaml.safe_load(f)
             self.draft_formatter = config['formatter']['draft']
             self.post_formatter = config['formatter']['post']
@@ -118,8 +118,7 @@ class Blog:
             filename += '.md'
 
         # add date prefix
-        date = time.strftime('%Y-%m-%d')
-        filename = f'{date}-{filename}'
+        filename = f'{time.strftime("%Y-%m-%d")}-{filename}'
 
         # fill current time in post_formatter
         if self.post_formatter['date'] is None:
@@ -143,6 +142,10 @@ class Blog:
             f.write(yaml_formatter)
             f.write('---\n')
         print(f'{os.path.join(self.post_dir, filename)} created as post.')
+
+        if self.args.open:
+            print('Opening post...')
+            os.system(f'start {os.path.join(self.post_dir, filename)}')
 
     def draft(self):
         filename: str = self.args.filename
@@ -169,6 +172,18 @@ class Blog:
             f.write(yaml_formatter)
             f.write('---\n')
         print(f'{os.path.join(self.draft_dir, filename)} created as draft.')
+
+        if self.args.open:
+            print('Opening draft...')
+            os.system(f'start {os.path.join(self.draft_dir, filename)}')
+
+    def draft_open(self):
+        self.args.open = True
+        self.draft()
+
+    def post_open(self):
+        self.args.open = True
+        self.post()
 
     def publish(self):
         filename: str = self.args.filename
