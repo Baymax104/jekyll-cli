@@ -42,6 +42,12 @@ Import-Module -Name "本程序目录的绝对路径"
 Import-Module PowerJekyll
 ```
 
+最后需要**设置环境变量**`BLOG_ROOT`为你的博客目录，你可以在系统控制面板中添加，也可在PowerShell中执行下面的命令设置环境变量
+
+```powershell
+[Environment]::SetEnvironmentVariable('BLOG_ROOT', '你的博客目录全路径', 'User')
+```
+
 ## 关于config.yml
 
 `config.yml`中可以配置博客的格式头`yaml fomatter`，在使用`post`、`draft`命令时，会使用配置的格式头初始化文档
