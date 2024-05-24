@@ -20,7 +20,9 @@ class BlogArgumentParser:
         serve_parser.add_argument('-d', '--draft', help='start blog server with drafts.', action='store_true')
 
         # list command parser
-        subparsers.add_parser('list', help='list all posts and drafts.', aliases=['l'])
+        list_parser = subparsers.add_parser('list', help='list all posts and drafts.', aliases=['l'])
+        list_parser.add_argument('-d', '--draft', help='list all drafts.', action='store_true')
+        list_parser.add_argument('-p', '--post', help='list all posts.', action='store_true')
 
         # open command parser
         open_parser = subparsers.add_parser('open', help='open post or draft in editor.', aliases=['o'])
@@ -28,12 +30,18 @@ class BlogArgumentParser:
         open_action.completer = self.__get_file_completer('both')
 
         # draft command parser
-        draft_parser = subparsers.add_parser('draft', help='create a draft in _drafts.', aliases=['d'])
+        draft_parser = subparsers.add_parser('draft', help='create a draft in _drafts.', aliases=['d'],)
         draft_parser.add_argument('filename', help='draft filename.', type=str)
+        draft_parser.add_argument('-t', '--title', help='draft title.', type=str)
+        draft_parser.add_argument('-c', '--cats', help='draft categories.', nargs='*')
+        draft_parser.add_argument('-T', '--tags', help='draft tags.',  nargs='*')
 
         # post command parser
         post_parser = subparsers.add_parser('post', help='create a post in _posts.', aliases=['p'])
         post_parser.add_argument('filename', help='post filename.', type=str)
+        post_parser.add_argument('-t', '--title', help='post title.', type=str)
+        post_parser.add_argument('-c', '--cats', help='post categories.', nargs='*')
+        post_parser.add_argument('-T', '--tags', help='post tags.',  nargs='*')
 
         # publish command parser
         publish_parser = subparsers.add_parser('publish', help='publish a draft.', aliases=['pub'])

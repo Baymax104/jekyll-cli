@@ -75,18 +75,19 @@ class Blog:
         os.system(command)
 
     def list_all(self):
-        posts = [file for file in os.listdir(self.post_dir) if file.endswith('.md')]
-        drafts = [file for file in os.listdir(self.draft_dir) if file.endswith('.md')]
+        if self.args.post or (not self.args.post and not self.args.draft):
+            # print posts
+            posts = [file for file in os.listdir(self.post_dir) if file.endswith('.md')]
+            print('-' * 100)
+            print('Posts:\n')
+            self.__format_print(posts)
 
-        # print posts
-        print('-' * 100)
-        print('Posts:\n')
-        self.__format_print(posts)
-
-        # print drafts
-        print('-' * 100)
-        print('Drafts:\n')
-        self.__format_print(drafts)
+        if self.args.draft or (not self.args.post and not self.args.draft):
+            # print drafts
+            drafts = [file for file in os.listdir(self.draft_dir) if file.endswith('.md')]
+            print('-' * 100)
+            print('Drafts:\n')
+            self.__format_print(drafts)
 
     def open_file(self):
         filename: str = self.args.filename
@@ -124,10 +125,20 @@ class Blog:
         if self.post_formatter['date'] is None:
             self.post_formatter['date'] = time.strftime("%Y-%m-%d %H:%M")
 
+        # fill formatter
+        if self.args.title is not None:
+            self.post_formatter['title'] = self.args.title
+
+        if self.args.cats is not None:
+            self.post_formatter['categories'] = self.args.cats
+
+        if self.args.tags is not None:
+            self.post_formatter['tags'] = self.args.tags
+
         # output the post formatter
         yaml_formatter = yaml.dump(self.post_formatter, default_flow_style=False,
                                    Dumper=yaml.RoundTripDumper, allow_unicode=True)
-        with open(filename, 'w') as f:
+        with open(os.path.join(self.post_dir, filename), 'w', encoding='utf-8') as f:
             f.write('---\n')
             f.write(yaml_formatter)
             f.write('---\n')
@@ -139,10 +150,20 @@ class Blog:
         if not filename.endswith('.md'):
             filename += '.md'
 
+        # fill formatter
+        if self.args.title is not None:
+            self.draft_formatter['title'] = self.args.title
+
+        if self.args.cats is not None:
+            self.draft_formatter['categories'] = self.args.cats
+
+        if self.args.tags is not None:
+            self.draft_formatter['tags'] = self.args.tags
+
         # output the draft formatter
         yaml_formatter = yaml.dump(self.draft_formatter, default_flow_style=False,
                                    Dumper=yaml.RoundTripDumper, allow_unicode=True)
-        with open(filename, 'w') as f:
+        with open(os.path.join(self.draft_dir, filename), 'w', encoding='utf-8') as f:
             f.write('---\n')
             f.write(yaml_formatter)
             f.write('---\n')
