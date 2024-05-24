@@ -1,9 +1,9 @@
 
 function blog {
     $Location = Get-Location
-    Set-Location -Path $PSScriptRoot
+    Set-Location -Path "$PSScriptRoot\core"
     try {
-        Invoke-Expression "python '$PSScriptRoot\main.py' $args"
+        Invoke-Expression "python '$PSScriptRoot\core\main.py' $args"
     } finally {
         Set-Location -Path $Location
     }
