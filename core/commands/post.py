@@ -52,7 +52,7 @@ class PostCommand(Command):
             f.write('---\n')
             f.write(yaml_formatter)
             f.write('---\n')
-        print(f'{os.path.join(self.post_dir, filename)} created as post.')
+        print(f'{os.path.join(self.post_dir, filename)} created as post successfully.')
 
         if args.open:
             print('Opening post...')

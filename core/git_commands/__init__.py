@@ -1,13 +1,8 @@
 # -*- coding: UTF-8 -*-
-import importlib
-import inspect
-import os
-
-from command import Command
-
-from status import GitStatusCommand
 
 from git import Repo
+
+from git_commands.status import GitStatusCommand
 
 
 def import_commands(subparsers, root_dir, config):
@@ -16,4 +11,4 @@ def import_commands(subparsers, root_dir, config):
     git_repo = Repo(root_dir)
 
     # init commands
-    GitStatusCommand(git_subparsers, git_repo, config, git_repo)
+    GitStatusCommand(git_subparsers, root_dir, config, git_repo)

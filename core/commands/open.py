@@ -1,9 +1,8 @@
 # -*- coding: UTF-8 -*-
-import fnmatch
 import os
 
 from command import Command
-from utils import get_file_completer
+from utils import get_file_completer, find_matched_file
 
 
 class OpenCommand(Command):
@@ -18,20 +17,14 @@ class OpenCommand(Command):
     def execute(self, args):
         filename: str = args.filename
 
-        if not filename.endswith('.md'):
-            filename += '.md'
-
-        # find file in _drafts
-        file = os.path.join(self.draft_dir, filename)
-        if os.path.isfile(file):
-            os.system(f'start {file}')
-            return
-
-        # find file in _posts
-        for file in os.listdir(self.post_dir):
-            if fnmatch.fnmatch(file, f'*{filename}*'):
-                os.system(f'start {os.path.join(self.post_dir, file)}')
+        # find matched file and open it
+        for directory in [self.post_dir, self.draft_dir]:
+            opened_file = find_matched_file(directory, filename)
+            if opened_file is not None:
+                opened_file = os.path.join(directory, opened_file)
+                print(f'Opening {opened_file}')
+                os.system(f'start {opened_file}')
                 return
 
         # not exist
-        print(f'No such file named {filename}\n')
+        print(f'No such file: {filename}\n')

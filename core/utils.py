@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+import fnmatch
 import os
 
 from argcomplete import completers
@@ -64,4 +64,11 @@ def get_file_completer(root_dir, option):
         drafts = [file for file in os.listdir(os.path.join(root_dir, '_drafts')) if file.endswith('.md')]
         posts.extend(drafts)
         return completers.ChoicesCompleter(posts)
+    return None
+
+
+def find_matched_file(directory, filename) -> str | None:
+    for file in os.listdir(directory):
+        if fnmatch.fnmatch(file, f'*{filename}*'):
+            return file
     return None

@@ -3,7 +3,7 @@ import os
 import time
 
 from command import Command
-from utils import get_file_completer, write_markdown, format_print, read_markdown
+from utils import get_file_completer, write_markdown, format_print, read_markdown, find_matched_file
 
 
 class PublishCommand(Command):
@@ -17,11 +17,12 @@ class PublishCommand(Command):
 
     def execute(self, args):
         filename: str = args.filename
-        if not filename.endswith('.md'):
-            filename += '.md'
+
+        # find published file
+        published_file = find_matched_file(self.draft_dir, filename)
 
         # no such file
-        if not os.path.isfile(os.path.join(self.draft_dir, filename)):
+        if published_file is None:
             drafts = [file for file in os.listdir(self.draft_dir) if file.endswith('.md')]
             print('-' * 100)
             print('Drafts:\n')
@@ -29,8 +30,8 @@ class PublishCommand(Command):
             print('\nNo such file in _drafts.\n')
             return
 
-        dest_file = os.path.join(self.post_dir, f'{time.strftime("%Y-%m-%d")}-{filename}')
-        src_file = os.path.join(self.draft_dir, filename)
+        dest_file = os.path.join(self.post_dir, f'{time.strftime("%Y-%m-%d")}-{published_file}')
+        src_file = os.path.join(self.draft_dir, published_file)
 
         # add date into yaml formatter
         yaml_formatter, article = read_markdown(src_file)

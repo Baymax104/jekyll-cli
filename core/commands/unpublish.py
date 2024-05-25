@@ -1,9 +1,8 @@
 # -*- coding: UTF-8 -*-
-import fnmatch
 import os
 
 from command import Command
-from utils import get_file_completer, write_markdown, read_markdown, format_print
+from utils import get_file_completer, write_markdown, read_markdown, format_print, find_matched_file
 
 
 class UnpublishCommand(Command):
@@ -17,15 +16,9 @@ class UnpublishCommand(Command):
 
     def execute(self, args):
         filename: str = args.filename
-        if not filename.endswith('.md'):
-            filename += '.md'
-
-        unpublished_file = None
 
         # find unpublished file
-        for file in os.listdir(self.post_dir):
-            if fnmatch.fnmatch(file, f'*{filename}*'):
-                unpublished_file = file
+        unpublished_file = find_matched_file(self.post_dir, filename)
 
         # no such file
         if unpublished_file is None:

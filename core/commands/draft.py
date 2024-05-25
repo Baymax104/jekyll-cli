@@ -44,7 +44,7 @@ class DraftCommand(Command):
             f.write('---\n')
             f.write(yaml_formatter)
             f.write('---\n')
-        print(f'{os.path.join(self.draft_dir, filename)} created as draft.')
+        print(f'{os.path.join(self.draft_dir, filename)} created as draft successfully.')
 
         if args.open:
             print('Opening draft...')
