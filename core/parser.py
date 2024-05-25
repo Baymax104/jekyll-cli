@@ -3,7 +3,7 @@ import argparse
 import importlib
 
 import argcomplete
-from ruamel import yaml
+from ruamel.yaml import YAML
 
 from commands.draft import DraftCommand
 from commands.list import ListCommand
@@ -24,7 +24,8 @@ class BlogParser(object):
 
         # read config
         with open('../config.yml', 'r') as f:
-            config = yaml.safe_load(f)
+            yaml = YAML(typ='safe', pure=True)
+            config = yaml.load(f)
 
         # import basic commands
         self.__import_basic_commands(subparsers, root_dir, config)

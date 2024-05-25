@@ -9,6 +9,7 @@
 - `serve`: 在本地通过Jekyll启动博客服务器
 - `list`: 列出所有的博文和草稿
 - `open`: 在编辑器中打开指定的博文或草稿
+- `remove`: 删除一个博文或草稿
 - `draft`: 创建一个位于`_drafts`目录下的新草稿
 - `post`: 创建一个位于`_posts`目录下的新博文
 - `publish`: 发布一个草稿，将其移动到`_posts`目录下
@@ -17,15 +18,14 @@
 其他功能
 
 - 自动补全子命令
-- 自动补全`_posts`目录和`_drafts`目录下的文件名
+- 自动补全命令相关文件名
 
 ## 安装
 
-在使用之前，你需要额外安装`argcomplete`包和`ruamel.yaml`包，可以在你的Python环境中使用下面的命令安装
+在使用之前，你需要额外安装一些依赖，可以在你的Python环境中进入到本程序目录，使用下面的命令安装
 
 ```powershell
-pip install argcomplete
-pip install ruamel.yaml
+pip install -r requirements.txt
 ```
 
 安装完成后，你可以在PowerShell中通过`Import-Module`命令导入模块，类似下面的命令
@@ -73,13 +73,10 @@ formatter:
 
 下面是一些使用示例：
 
-```powershell
+```
 # 启动本地服务器
 blog serve
 blog s
-
-# 本地博客显示草稿
-blog s -d
 
 # 列出所有的博文和草稿
 blog list
@@ -88,16 +85,26 @@ blog l
 # 创建一个新的草稿
 blog draft my-draft
 blog d my-draft
+blog do my-draft  # 创建草稿后自动打开
+
+# 创建一个新的博文
+blog post my-post
+blog p my-post
+blog po my-post  # 创建博文后自动打开
+
+# 删除一个草稿或博文
+blog remove my-file
+blog r my-file
 
 # 打开指定的博文或草稿
-blog open 2024-05-23-my-post
-blog o 2024-05-23-my-post
+blog open my-post
+blog o my-post
 
 # 发布一个草稿
 blog publish my-draft
 blog pub my-draft
 
 # 撤销发布一篇已发布的博文
-blog unpublish 2024-05-23-my-post
-blog unpub 2024-05-23-my-post
+blog unpublish my-post
+blog unpub my-post
 ```
