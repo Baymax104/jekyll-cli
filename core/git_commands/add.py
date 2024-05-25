@@ -12,17 +12,26 @@ class GitAddCommand(Command):
         self.repo = repo
         self.parser = subparsers.add_parser('add', help='add file(s) to staging area.')
         action = self.parser.add_argument('files', help='the file(s) to be added.', nargs='*', default=[])
-        action.completer = ChoicesCompleter(repo.untracked_files)
+        action.completer = self.__add_completer()
         self.parser.set_defaults(execute=self.execute)
+
+    def __add_completer(self):
+        modified_files = [item.a_path for item in self.repo.index.diff(None)]
+        untracked_files = self.repo.untracked_files
+        return ChoicesCompleter(untracked_files + modified_files)
 
     def execute(self, args):
 
+        modified_files = [item.a_path for item in self.repo.index.diff(None)]
+        untracked_files = self.repo.untracked_files
+        changed_files = untracked_files + modified_files
+
         if len(args.files) == 0:
-            # if there is no file indicated, add all untracked files
-            matched_files = self.repo.untracked_files
+            # if there is no file indicated, add all changed files
+            matched_files = changed_files
         else:
-            matched_files = [untracked for untracked in self.repo.untracked_files if
-                             any(fnmatch.fnmatch(untracked, f'*{file}*') for file in args.files)]
+            matched_files = [changed for changed in changed_files if
+                             any(fnmatch.fnmatch(changed, f'*{file}*') for file in args.files)]
 
         if len(matched_files) == 0 and len(args.files) > 0:
             print('No such file(s)')

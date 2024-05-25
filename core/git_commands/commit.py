@@ -10,10 +10,11 @@ class GitCommitCommand(Command):
         super().__init__(subparsers, root_dir, config)
         self.repo = repo
         self.parser = subparsers.add_parser('commit', help='commit the changes.')
-        self.parser.add_argument('message', type=str, help='the commit message')
+        self.parser.add_argument('message', help='commit message.', type=str, nargs='+')
         self.parser.set_defaults(execute=self.execute)
 
     def execute(self, args):
+        args.message = ' '.join(args.message)
         commit = self.repo.index.commit(args.message)
         commited_files = commit.stats.files.keys()
 
