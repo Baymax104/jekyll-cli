@@ -13,6 +13,7 @@ class PostCommand(Command):
         super().__init__(subparsers, root_dir, config)
         self.post_formatter = config['formatter']['post']
 
+        # post command
         self.parser = subparsers.add_parser('post', help='create a post in _posts.', aliases=['p'])
         self.parser.add_argument('filename', help='post filename.', type=str)
         self.parser.add_argument('-t', '--title', help='post title.', type=str)
@@ -20,6 +21,14 @@ class PostCommand(Command):
         self.parser.add_argument('-T', '--tags', help='post tags.', nargs='*')
         self.parser.add_argument('-o', '--open', help='open post.', action='store_true')
         self.parser.set_defaults(execute=self.execute)
+
+        # post and open command
+        self.po_parser = subparsers.add_parser('po', help='create a post and open it.')
+        self.po_parser.add_argument('filename', help='post filename.', type=str)
+        self.po_parser.add_argument('-t', '--title', help='post title.', type=str)
+        self.po_parser.add_argument('-c', '--cats', help='post categories.', nargs='*')
+        self.po_parser.add_argument('-T', '--tags', help='post tags.', nargs='*')
+        self.po_parser.set_defaults(execute=self.execute, open=True)
 
     def execute(self, args):
         filename: str = args.filename

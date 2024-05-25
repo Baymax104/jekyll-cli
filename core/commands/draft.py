@@ -12,6 +12,7 @@ class DraftCommand(Command):
         super().__init__(subparsers, root_dir, config)
         self.draft_formatter = config['formatter']['draft']
 
+        # draft command
         self.parser = subparsers.add_parser('draft', help='create a draft in _drafts.', aliases=['d'])
         self.parser.add_argument('filename', help='draft filename.', type=str)
         self.parser.add_argument('-t', '--title', help='draft title.', type=str)
@@ -19,6 +20,14 @@ class DraftCommand(Command):
         self.parser.add_argument('-T', '--tags', help='draft tags.', nargs='*')
         self.parser.add_argument('-o', '--open', help='open draft.', action='store_true')
         self.parser.set_defaults(execute=self.execute)
+
+        # draft and open command
+        self.do_parser = subparsers.add_parser('do', help='create a draft and open it.')
+        self.do_parser.add_argument('filename', help='draft filename.', type=str)
+        self.do_parser.add_argument('-t', '--title', help='draft title.', type=str)
+        self.do_parser.add_argument('-c', '--cats', help='draft categories.', nargs='*')
+        self.do_parser.add_argument('-T', '--tags', help='draft tags.', nargs='*')
+        self.do_parser.set_defaults(execute=self.execute, open=True)
 
     def execute(self, args):
         filename: str = args.filename
