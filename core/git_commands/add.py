@@ -1,9 +1,8 @@
 # -*- coding: UTF-8 -*-
 import fnmatch
-
 from git import Repo
-
 from command import Command
+from argcomplete.completers import ChoicesCompleter
 
 
 class GitAddCommand(Command):
@@ -12,7 +11,8 @@ class GitAddCommand(Command):
         super().__init__(subparsers, root_dir, config)
         self.repo = repo
         self.parser = subparsers.add_parser('add', help='add file(s) to staging area.')
-        self.parser.add_argument('files', help='the file(s) to be added.', nargs='*', default=[])
+        action = self.parser.add_argument('files', help='the file(s) to be added.', nargs='*', default=[])
+        action.completer = ChoicesCompleter(repo.untracked_files)
         self.parser.set_defaults(execute=self.execute)
 
     def execute(self, args):
@@ -33,4 +33,4 @@ class GitAddCommand(Command):
         print('Files added successfully: \n')
         for file in matched_files:
             print(file)
-        print('\n')
+        print()

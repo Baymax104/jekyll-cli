@@ -3,6 +3,7 @@
 from git import Repo
 
 from git_commands.add import GitAddCommand
+from git_commands.commit import GitCommitCommand
 from git_commands.status import GitStatusCommand
 
 
@@ -14,3 +15,4 @@ def import_commands(subparsers, root_dir, config):
     # init commands
     GitStatusCommand(git_subparsers, root_dir, config, git_repo)
     GitAddCommand(git_subparsers, root_dir, config, git_repo)
+    GitCommitCommand(git_subparsers, root_dir, config, git_repo)

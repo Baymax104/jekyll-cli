@@ -19,7 +19,7 @@ class GitStatusCommand(Command):
         modified_files = [item.a_path for item in self.repo.index.diff(None)]
         staged_files = [item.a_path for item in self.repo.index.diff("HEAD")]
 
-        print('Blog git status:')
+        print('\nBlog git status:')
 
         print('-' * 100)
         print('Untracked files:\n')
@@ -41,3 +41,4 @@ class GitStatusCommand(Command):
             format_print(staged_files)
         else:
             print('No staged files.')
+        print()

@@ -1,8 +1,7 @@
 # -*- coding: UTF-8 -*-
 import fnmatch
 import os
-
-from argcomplete import completers
+from argcomplete.completers import ChoicesCompleter
 from ruamel import yaml
 
 
@@ -54,16 +53,16 @@ def write_markdown(file, yaml_formatter, article):
 
 def get_file_completer(root_dir, option):
     if option == 'post':
-        return completers.ChoicesCompleter(
+        return ChoicesCompleter(
             [file for file in os.listdir(os.path.join(root_dir, '_posts')) if file.endswith('.md')])
     elif option == 'draft':
-        return completers.ChoicesCompleter(
+        return ChoicesCompleter(
             [file for file in os.listdir(os.path.join(root_dir, '_drafts')) if file.endswith('.md')])
     elif option == 'both':
         posts = [file for file in os.listdir(os.path.join(root_dir, '_posts')) if file.endswith('.md')]
         drafts = [file for file in os.listdir(os.path.join(root_dir, '_drafts')) if file.endswith('.md')]
         posts.extend(drafts)
-        return completers.ChoicesCompleter(posts)
+        return ChoicesCompleter(posts)
     return None
 
 
