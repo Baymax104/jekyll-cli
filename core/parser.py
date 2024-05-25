@@ -1,13 +1,18 @@
 # -*- coding: UTF-8 -*-
 import argparse
 import importlib
-import inspect
-import os
 
 import argcomplete
 from ruamel import yaml
 
-from command import Command
+from commands.draft import DraftCommand
+from commands.list import ListCommand
+from commands.open import OpenCommand
+from commands.post import PostCommand
+from commands.publish import PublishCommand
+from commands.remove import RemoveCommand
+from commands.serve import ServeCommand
+from commands.unpublish import UnpublishCommand
 
 
 class BlogParser(object):
@@ -29,20 +34,22 @@ class BlogParser(object):
 
     @staticmethod
     def __import_basic_commands(subparsers, root_dir, config):
-        for script in os.listdir('commands'):
-            if script.endswith('.py'):
-                module = importlib.import_module(f'commands.{script[:-3]}')
-                for name, cls in inspect.getmembers(module):
-                    if name != 'Command' and inspect.isclass(cls) and issubclass(cls, Command):
-                        cls(subparsers, root_dir, config)
+        ServeCommand(subparsers, root_dir, config)
+        ListCommand(subparsers, root_dir, config)
+        OpenCommand(subparsers, root_dir, config)
+        PostCommand(subparsers, root_dir, config)
+        DraftCommand(subparsers, root_dir, config)
+        PublishCommand(subparsers, root_dir, config)
+        UnpublishCommand(subparsers, root_dir, config)
+        RemoveCommand(subparsers, root_dir, config)
 
     @staticmethod
     def __import_extra_commands(module_name, subparsers, root_dir, config):
         module = importlib.import_module(module_name)
-        if hasattr(module, 'init'):
-            init = getattr(module, 'init')
-            if callable(init):
-                init(subparsers, root_dir, config)
+        if hasattr(module, 'import_commands'):
+            import_commands = getattr(module, 'import_commands')
+            if callable(import_commands):
+                import_commands(subparsers, root_dir, config)
 
     def parse(self):
         argcomplete.autocomplete(self.parser)
