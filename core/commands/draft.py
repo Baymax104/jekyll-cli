@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 
-from ruamel import yaml
+from ruamel.yaml import YAML
 
 from command import Command
 
@@ -47,11 +47,10 @@ class DraftCommand(Command):
             self.draft_formatter['tags'] = args.tags
 
         # output the draft formatter
-        yaml_formatter = yaml.dump(self.draft_formatter, default_flow_style=False,
-                                   Dumper=yaml.RoundTripDumper, allow_unicode=True)
+        yaml = YAML(typ='rt', pure=True)
         with open(os.path.join(self.draft_dir, filename), 'w', encoding='utf-8') as f:
             f.write('---\n')
-            f.write(yaml_formatter)
+            yaml.dump(self.draft_formatter, f)
             f.write('---\n')
         print(f'{os.path.join(self.draft_dir, filename)} created as draft successfully.')
 

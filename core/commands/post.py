@@ -2,7 +2,7 @@
 import os
 import time
 
-from ruamel import yaml
+from ruamel.yaml import YAML
 
 from command import Command
 
@@ -55,11 +55,10 @@ class PostCommand(Command):
             self.post_formatter['tags'] = args.tags
 
         # output the post formatter
-        yaml_formatter = yaml.dump(self.post_formatter, default_flow_style=False,
-                                   Dumper=yaml.RoundTripDumper, allow_unicode=True)
+        yaml = YAML(typ='rt', pure=True)
         with open(os.path.join(self.post_dir, filename), 'w', encoding='utf-8') as f:
             f.write('---\n')
-            f.write(yaml_formatter)
+            yaml.dump(self.post_formatter, f)
             f.write('---\n')
         print(f'{os.path.join(self.post_dir, filename)} created as post successfully.')
 
