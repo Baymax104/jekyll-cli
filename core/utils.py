@@ -2,7 +2,7 @@
 import fnmatch
 import os
 from argcomplete.completers import ChoicesCompleter
-from ruamel import yaml
+from ruamel.yaml import YAML
 
 
 def check_root(root_dir: str) -> str:
@@ -36,17 +36,17 @@ def read_markdown(file):
 
     # split the content
     parts = content.split('---\n', maxsplit=2)
-    yaml_formatter = yaml.safe_load(parts[1])
+    yaml = YAML(typ='safe', pure=True)
+    yaml_formatter = yaml.load(parts[1])
     article = parts[2]
     return yaml_formatter, article
 
 
 def write_markdown(file, yaml_formatter, article):
-    yaml_formatter = yaml.dump(yaml_formatter, default_flow_style=False,
-                               Dumper=yaml.RoundTripDumper, allow_unicode=True)
+    yaml = YAML(typ='rt', pure=True)
     with open(file, 'w', encoding='utf-8') as f:
         f.write('---\n')
-        f.write(yaml_formatter)
+        yaml.dump(yaml_formatter, f)
         f.write('---\n')
         f.write(article)
 
