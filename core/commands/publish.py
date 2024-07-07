@@ -9,7 +9,7 @@ from utils import get_file_completer, write_markdown, format_print, read_markdow
 class PublishCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        super().__init__(subparsers, root_dir, config)
+        super().__init__(root_dir, config)
         self.parser = subparsers.add_parser('publish', help='publish a draft.', aliases=['pub'])
         publish_action = self.parser.add_argument('filename', help='draft filename in _drafts.', type=str)
         publish_action.completer = get_file_completer(root_dir, 'draft')

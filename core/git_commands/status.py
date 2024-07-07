@@ -9,7 +9,7 @@ from utils import format_print
 class GitStatusCommand(Command):
 
     def __init__(self, subparsers, root_dir, config, repo: Repo):
-        super().__init__(subparsers, root_dir, config)
+        super().__init__(root_dir, config)
         self.repo = repo
         self.parser = subparsers.add_parser('status', help='show blog git status', aliases=['s'])
         self.parser.set_defaults(execute=self.execute)

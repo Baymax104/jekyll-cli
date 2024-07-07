@@ -8,7 +8,7 @@ from utils import get_file_completer, find_matched_file
 class OpenCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        super().__init__(subparsers, root_dir, config)
+        super().__init__(root_dir, config)
         self.parser = subparsers.add_parser('open', help='open post or draft in editor.', aliases=['o'])
         open_action = self.parser.add_argument('filename', help='post or draft filename.', type=str)
         open_action.completer = get_file_completer(root_dir, 'both')

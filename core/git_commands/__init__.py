@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+import warnings
 from git import Repo
 
 from git_commands.add import GitAddCommand
@@ -9,6 +9,7 @@ from git_commands.status import GitStatusCommand
 
 
 def import_commands(subparsers, root_dir, config):
+    warnings.warn('git commands are deprecated.', DeprecationWarning)
     parser = subparsers.add_parser('git', help='use git commands')
     git_subparsers = parser.add_subparsers(dest='git_commands', title='git commands')
     git_repo = Repo(root_dir)

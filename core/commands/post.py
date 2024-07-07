@@ -10,7 +10,7 @@ from command import Command
 class PostCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        super().__init__(subparsers, root_dir, config)
+        super().__init__(root_dir, config)
         self.post_formatter = config['formatter']['post']
 
         # post command

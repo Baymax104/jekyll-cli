@@ -7,7 +7,7 @@ from command import Command
 class GitCommitCommand(Command):
 
     def __init__(self, subparsers, root_dir, config, repo: Repo):
-        super().__init__(subparsers, root_dir, config)
+        super().__init__(root_dir, config)
         self.repo = repo
         self.parser = subparsers.add_parser('commit', help='commit the changes.')
         self.parser.add_argument('message', help='commit message.', type=str, nargs='+')

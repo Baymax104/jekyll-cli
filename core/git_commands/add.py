@@ -1,14 +1,16 @@
 # -*- coding: UTF-8 -*-
 import fnmatch
-from git import Repo
-from command import Command
+
 from argcomplete.completers import ChoicesCompleter
+from git import Repo
+
+from command import Command
 
 
 class GitAddCommand(Command):
 
     def __init__(self, subparsers, root_dir, config, repo: Repo):
-        super().__init__(subparsers, root_dir, config)
+        super().__init__(root_dir, config)
         self.repo = repo
         self.parser = subparsers.add_parser('add', help='add file(s) to staging area.')
         action = self.parser.add_argument('files', help='the file(s) to be added.', nargs='*', default=[])

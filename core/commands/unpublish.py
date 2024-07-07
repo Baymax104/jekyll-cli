@@ -8,7 +8,7 @@ from utils import get_file_completer, write_markdown, read_markdown, format_prin
 class UnpublishCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        super().__init__(subparsers, root_dir, config)
+        super().__init__(root_dir, config)
         self.parser = subparsers.add_parser('unpublish', help='unpublish a post in _posts.', aliases=['unpub'])
         unpublish_action = self.parser.add_argument('filename', help='post filename in _posts.', type=str)
         unpublish_action.completer = get_file_completer(root_dir, 'post')

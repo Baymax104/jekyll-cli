@@ -8,7 +8,7 @@ from utils import find_matched_file, get_file_completer
 class RemoveCommand(Command):
 
     def __init__(self, subparsers, root_dir, config):
-        super().__init__(subparsers, root_dir, config)
+        super().__init__(root_dir, config)
         self.parser = subparsers.add_parser('remove', help='remove a post or draft', aliases=['r'])
         action = self.parser.add_argument('filename', help='post or draft filename', type=str)
         action.completer = get_file_completer(root_dir, 'both')
