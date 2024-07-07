@@ -1,3 +1,6 @@
+# manage mode
+mode: single  # [single | item]
+
 # yaml formatter
 formatter:
   draft:
