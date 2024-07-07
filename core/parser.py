@@ -7,6 +7,7 @@ import shutil
 import argcomplete
 from ruamel.yaml import YAML
 
+from commands.build import BuildCommand
 from commands.config import ConfigCommand
 from commands.draft import DraftCommand
 from commands.list import ListCommand
@@ -31,9 +32,6 @@ class BlogParser(object):
         # import basic commands
         self.__import_basic_commands(subparsers, root_dir, config, config_path)
 
-        # import git commands
-        # self.__import_extra_commands('git_commands', subparsers, root_dir, config)
-
     @staticmethod
     def __import_basic_commands(subparsers, root_dir, config, config_path):
         ServeCommand(subparsers, root_dir, config)
@@ -45,6 +43,7 @@ class BlogParser(object):
         UnpublishCommand(subparsers, root_dir, config)
         RemoveCommand(subparsers, root_dir, config)
         ConfigCommand(subparsers, root_dir, config, config_path)
+        BuildCommand(subparsers, root_dir, config)
 
     @staticmethod
     def __import_extra_commands(module_name, subparsers, root_dir, config):

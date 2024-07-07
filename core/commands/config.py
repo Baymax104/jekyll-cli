@@ -11,15 +11,15 @@ class ConfigCommand(Command):
     def __init__(self, subparsers, root_dir, config, config_path):
         super().__init__(root_dir, config)
         self.config_path = config_path
-        self.parser = subparsers.add_parser('config', help='configuration command')
+        self.parser = subparsers.add_parser('config', help='configuration command.')
         subparsers = self.parser.add_subparsers(dest='config_command', title='config commands')
 
         # list command
-        list_parser = subparsers.add_parser('list', help='list configuration')
+        list_parser = subparsers.add_parser('list', help='list configurations.')
         list_parser.set_defaults(execute=self.list_config)
 
         # set command
-        set_parser = subparsers.add_parser('set', help='set configuration')
+        set_parser = subparsers.add_parser('set', help='set configuration.')
         set_parser.add_argument('kwargs', type=lambda arg: arg.split('=', 1), help='argument like "<key>=<value>"')
         set_parser.set_defaults(execute=self.set_config)
 
