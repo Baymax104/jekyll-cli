@@ -18,6 +18,9 @@ def check_root(root_dir: str) -> str:
 
 
 def format_print(files):
+    if len(files) == 0:
+        return
+
     max_len = max(len(f"[{i + 1}] {file}") for i, file in enumerate(files))
     format_str = f"{{:<{max_len}}} \t\t {{}}"
 
