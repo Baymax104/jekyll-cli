@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import fnmatch
 import os
+
 from argcomplete.completers import ChoicesCompleter
 from ruamel.yaml import YAML
 

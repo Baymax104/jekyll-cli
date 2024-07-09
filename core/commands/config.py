@@ -20,7 +20,7 @@ class ConfigCommand(Command):
 
         # set command
         set_parser = subparsers.add_parser('set', help='set configuration.')
-        set_parser.add_argument('kwargs', type=lambda arg: arg.split('=', 1), help='argument like "<key>=<value>"')
+        set_parser.add_argument('--mode', type=str, choices=['single', 'item'], help='manage mode, only single or item')
         set_parser.set_defaults(execute=self.set_config)
 
     def list_config(self, _):
@@ -30,7 +30,8 @@ class ConfigCommand(Command):
             yaml.dump(content, sys.stdout)
 
     def set_config(self, args):
-        key, value = args.kwargs
-        with open(self.config_path, 'a') as f:
-            f.write(f'{key}: {value}\n')
-        print(f'set {key}={value} successfully.')
+        if args.mode is not None:
+            self.config['mode'] = args.mode
+            yaml = YAML(typ='rt', pure=True)
+            with open(self.config_path, 'w', encoding='utf-8') as f:
+                yaml.dump(self.config, f)

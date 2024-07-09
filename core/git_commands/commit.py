@@ -22,4 +22,3 @@ class GitCommitCommand(Command):
         for file in commited_files:
             print(file)
         print()
-

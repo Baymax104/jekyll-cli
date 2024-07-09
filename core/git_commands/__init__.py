@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import warnings
+
 from git import Repo
 
 from git_commands.add import GitAddCommand

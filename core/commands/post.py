@@ -31,6 +31,55 @@ class PostCommand(Command):
         self.po_parser.set_defaults(execute=self.execute, open=True)
 
     def execute(self, args):
+        mode = self.config['mode']
+        if mode == 'single':
+            self.single_action(args)
+        elif mode == 'item':
+            self.item_action(args)
+
+    def item_action(self, args):
+        filename: str = args.filename
+        item_dir = os.path.join(self.post_dir, filename)
+        assets_dir = os.path.join(item_dir, 'assets')
+        if not os.path.exists(item_dir):
+            os.mkdir(item_dir)
+        if not os.path.exists(assets_dir):
+            os.mkdir(assets_dir)
+
+        # add .md suffix
+        if not filename.endswith('.md'):
+            filename += '.md'
+
+        # add date prefix
+        filename = f'{time.strftime("%Y-%m-%d")}-{filename}'
+
+        # fill current time in post_formatter
+        if self.post_formatter['date'] is None:
+            self.post_formatter['date'] = time.strftime("%Y-%m-%d %H:%M")
+
+        # fill formatter
+        if args.title is not None:
+            self.post_formatter['title'] = args.title
+
+        if args.cats is not None:
+            self.post_formatter['categories'] = args.cats
+
+        if args.tags is not None:
+            self.post_formatter['tags'] = args.tags
+
+        # output the post formatter
+        yaml = YAML(typ='rt', pure=True)
+        with open(os.path.join(item_dir, filename), 'w', encoding='utf-8') as f:
+            f.write('---\n')
+            yaml.dump(self.post_formatter, f)
+            f.write('---\n')
+        print(f'{os.path.join(item_dir, filename)} created as post successfully.')
+
+        if args.open:
+            print('Opening post...')
+            os.system(f'start {os.path.join(item_dir, filename)}')
+
+    def single_action(self, args):
         filename: str = args.filename
 
         # add .md suffix
