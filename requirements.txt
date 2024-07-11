@@ -1,3 +1,2 @@
 argcomplete==3.3.0
-gitpython==3.1.43
 ruamel.yaml==0.18.6

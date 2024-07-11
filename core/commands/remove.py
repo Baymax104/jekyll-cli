@@ -1,29 +1,22 @@
 # -*- coding: UTF-8 -*-
-import os
 
-from command import Command
-from utils import find_matched_file, get_file_completer
+from argcomplete import ChoicesCompleter
 
 
-class RemoveCommand(Command):
+class RemoveCommand:
 
-    def __init__(self, subparsers, root_dir, config):
-        super().__init__(root_dir, config)
+    def __init__(self, subparsers, blog):
+        self.blog = blog
         self.parser = subparsers.add_parser('remove', help='remove a post or draft', aliases=['r'])
-        action = self.parser.add_argument('filename', help='post or draft filename', type=str)
-        action.completer = get_file_completer(root_dir, 'both')
+        action = self.parser.add_argument('name', help='post or draft name', type=str)
+        action.completer = ChoicesCompleter(self.blog.articles)
         self.parser.set_defaults(execute=self.execute)
 
     def execute(self, args):
-        filename: str = args.filename
-
-        # find matched file and open it
-        for directory in [self.post_dir, self.draft_dir]:
-            removed_file = find_matched_file(directory, filename)
-            if removed_file is not None:
-                removed_file = os.path.join(directory, removed_file)
-                os.remove(removed_file)
-                print(f'{removed_file} removed successfully.')
-                return
-
-        print(f'No such file: {removed_file}')
+        item = self.blog.find(args.name)
+        if not item:
+            print(f'No such item: {args.name}')
+            return
+        item.remove()
+        self.blog.remove(item)
+        print(f'{item.path} removed successfully.')

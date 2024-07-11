@@ -2,8 +2,9 @@
 import fnmatch
 import os
 
-from argcomplete.completers import ChoicesCompleter
 from ruamel.yaml import YAML
+
+from config import Config
 
 
 def check_root(root_dir: str) -> str:
@@ -17,27 +18,26 @@ def check_root(root_dir: str) -> str:
         return root_dir
 
 
-def format_print(files):
-    if len(files) == 0:
+def format_print(items):
+    if len(items) == 0:
         return
 
-    max_len = max(len(f"[{i + 1}] {file}") for i, file in enumerate(files))
+    max_len = max(len(f"[{i + 1}] {file}") for i, file in enumerate(items))
     format_str = f"{{:<{max_len}}} \t\t {{}}"
 
-    for i in range(0, len(files), 2):
-        if i + 1 < len(files):
-            file1 = f"[{i + 1}] {files[i]}"
-            file2 = f"[{i + 2}] {files[i + 1]}"
-            print(format_str.format(file1, file2))
+    for i in range(0, len(items), 2):
+        if i + 1 < len(items):
+            item1 = f"[{i + 1}] {items[i]}"
+            item2 = f"[{i + 2}] {items[i + 1]}"
+            print(format_str.format(item1, item2))
         else:
-            file1 = f"[{i + 1}] {files[i]}"
-            print(file1)
+            item1 = f"[{i + 1}] {items[i]}"
+            print(item1)
 
 
-def read_markdown(file):
-    with open(file, 'r', encoding='utf-8') as f:
+def read_markdown(md_file):
+    with open(md_file, 'r', encoding='utf-8') as f:
         content = f.read()
-
     # split the content
     parts = content.split('---\n', maxsplit=2)
     yaml = YAML(typ='safe', pure=True)
@@ -46,32 +46,21 @@ def read_markdown(file):
     return yaml_formatter, article
 
 
-def write_markdown(file, yaml_formatter, article):
+def write_markdown(md_file, yaml_formatter, article):
     yaml = YAML(typ='rt', pure=True)
-    with open(file, 'w', encoding='utf-8') as f:
+    with open(md_file, 'w', encoding='utf-8') as f:
         f.write('---\n')
         yaml.dump(yaml_formatter, f)
         f.write('---\n')
         f.write(article)
 
 
-def get_file_completer(root_dir, option):
-    if option == 'post':
-        return ChoicesCompleter(
-            [file for file in os.listdir(os.path.join(root_dir, '_posts')) if file.endswith('.md')])
-    elif option == 'draft':
-        return ChoicesCompleter(
-            [file for file in os.listdir(os.path.join(root_dir, '_drafts')) if file.endswith('.md')])
-    elif option == 'both':
-        posts = [file for file in os.listdir(os.path.join(root_dir, '_posts')) if file.endswith('.md')]
-        drafts = [file for file in os.listdir(os.path.join(root_dir, '_drafts')) if file.endswith('.md')]
-        posts.extend(drafts)
-        return ChoicesCompleter(posts)
-    return None
-
-
-def find_matched_file(directory, filename) -> str | None:
+def find_matched_markdown(directory, name) -> str | None:
     for file in os.listdir(directory):
-        if fnmatch.fnmatch(file, f'*{filename}*'):
+        if fnmatch.fnmatch(file, f'*{name}*') and file.endswith('.md'):
             return file
     return None
+
+
+root_dir = check_root(os.getenv('BLOG_ROOT'))
+config = Config()

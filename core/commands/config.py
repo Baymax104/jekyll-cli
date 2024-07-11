@@ -1,16 +1,14 @@
 # -*- coding: UTF-8 -*-
+
+import json
 import sys
 
-from ruamel.yaml import YAML
 
-from command import Command
+class ConfigCommand:
 
-
-class ConfigCommand(Command):
-
-    def __init__(self, subparsers, root_dir, config, config_path):
-        super().__init__(root_dir, config)
-        self.config_path = config_path
+    def __init__(self, subparsers, config, blog):
+        self.config = config
+        self.blog = blog
         self.parser = subparsers.add_parser('config', help='configuration command.')
         subparsers = self.parser.add_subparsers(dest='config_command', title='config commands')
 
@@ -24,14 +22,8 @@ class ConfigCommand(Command):
         set_parser.set_defaults(execute=self.set_config)
 
     def list_config(self, _):
-        yaml = YAML(typ='rt', pure=True)
-        with open(self.config_path, 'r') as f:
-            content = yaml.load(f)
-            yaml.dump(content, sys.stdout)
+        json.dump(self.config.content, sys.stdout, indent=4)
 
     def set_config(self, args):
-        if args.mode is not None:
-            self.config['mode'] = args.mode
-            yaml = YAML(typ='rt', pure=True)
-            with open(self.config_path, 'w', encoding='utf-8') as f:
-                yaml.dump(self.config, f)
+        self.config.mode = args.mode
+        self.blog.refresh()

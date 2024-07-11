@@ -1,41 +1,27 @@
 # -*- coding: UTF-8 -*-
-import os
 
-from command import Command
-from utils import get_file_completer, write_markdown, read_markdown, format_print, find_matched_file
+from argcomplete import ChoicesCompleter
+
+from item import ArticleType
+from utils import format_print
 
 
-class UnpublishCommand(Command):
+class UnpublishCommand:
 
-    def __init__(self, subparsers, root_dir, config):
-        super().__init__(root_dir, config)
+    def __init__(self, subparsers, blog):
+        self.blog = blog
         self.parser = subparsers.add_parser('unpublish', help='unpublish a post in _posts.', aliases=['unpub'])
-        unpublish_action = self.parser.add_argument('filename', help='post filename in _posts.', type=str)
-        unpublish_action.completer = get_file_completer(root_dir, 'post')
+        unpublish_action = self.parser.add_argument('name', help='post name in _posts.', type=str)
+        unpublish_action.completer = ChoicesCompleter(self.blog.posts)
         self.parser.set_defaults(execute=self.execute)
 
     def execute(self, args):
-        filename: str = args.filename
-
-        # find unpublished file
-        unpublished_file = find_matched_file(self.post_dir, filename)
-
-        # no such file
-        if unpublished_file is None:
-            posts = [file for file in os.listdir(self.post_dir) if file.endswith('.md')]
+        item = self.blog.find(args.name, ArticleType.Post)
+        if not item:
             print('-' * 100)
             print('Posts:\n')
-            format_print(posts)
+            format_print(self.blog.posts)
             print('\nNo such file in _posts.\n')
             return
-
-        src_file = os.path.join(self.post_dir, unpublished_file)
-        dest_file = os.path.join(self.draft_dir, unpublished_file.split('-', maxsplit=3)[3])
-
-        # remove the date in yaml formatter
-        yaml_formatter, article = read_markdown(src_file)
-        del yaml_formatter['date']
-        write_markdown(dest_file, yaml_formatter, article)
-
-        os.remove(src_file)
-        print(f'Post "{src_file}"\nunpublished as "{dest_file}"')
+        item.unpublish()
+        print(f'Post "{item.name}"\nunpublished as "{item.file_path}"')
