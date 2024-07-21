@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 
-from utils import root_dir
+import settings
 
 
 class BuildCommand:
@@ -12,7 +12,7 @@ class BuildCommand:
         self.parser.set_defaults(execute=self.execute)
 
     def execute(self, args):
-        os.chdir(root_dir)
+        os.chdir(settings.root_dir)
         command = 'bundle exec jekyll build'
         if args.draft:
             command += ' --drafts'

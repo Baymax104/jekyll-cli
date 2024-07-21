@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 
-from item import Item, ArticleType
+from item import Item, BlogType
 
 
 class PostCommand:
@@ -27,7 +27,7 @@ class PostCommand:
         self.po_parser.set_defaults(execute=self.execute, open=True)
 
     def execute(self, args):
-        item = Item(args.name, ArticleType.Post)
+        item = Item(args.name, BlogType.Post)
         item.create(args)
         self.blog.add(item)
         print(f'{item.file_path} created as post successfully.')

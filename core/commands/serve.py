@@ -2,7 +2,7 @@
 
 import os
 
-from utils import root_dir
+import settings
 
 
 class ServeCommand:
@@ -13,7 +13,7 @@ class ServeCommand:
         self.parser.set_defaults(execute=self.execute)
 
     def execute(self, args):
-        os.chdir(root_dir)
+        os.chdir(settings.root_dir)
         command = 'bundle exec jekyll s'
         if args.draft:
             command += ' --drafts'

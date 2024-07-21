@@ -2,7 +2,7 @@
 
 from argcomplete import ChoicesCompleter
 
-from item import ArticleType
+from item import BlogType
 from utils import format_print
 
 
@@ -16,7 +16,7 @@ class UnpublishCommand:
         self.parser.set_defaults(execute=self.execute)
 
     def execute(self, args):
-        item = self.blog.find(args.name, ArticleType.Post)
+        item = self.blog.find(args.name, BlogType.Post)
         if not item:
             print('-' * 100)
             print('Posts:\n')

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-import os
 import shutil
+from pathlib import Path
 
 from ruamel.yaml import YAML
 
@@ -8,15 +8,15 @@ from ruamel.yaml import YAML
 class Config:
 
     def __init__(self):
-        home = os.environ['USERPROFILE']
-        power_jekyll_home = os.path.join(home, '.powerjekyll')
-        self.__config_path = os.path.join(power_jekyll_home, 'config.yml')
+        home = Path().home()
+        power_jekyll_home = home / '.powerjekyll'
+        self.__config_path = power_jekyll_home / 'config.yml'
 
         # create app home
-        if not os.path.exists(power_jekyll_home):
-            os.mkdir(power_jekyll_home)
+        if not power_jekyll_home.exists():
+            power_jekyll_home.mkdir(exist_ok=True)
 
-        if not os.path.exists(self.__config_path):
+        if not self.__config_path.exists():
             shutil.move('../config.yml.example', self.__config_path)
 
         # read config
@@ -56,4 +56,4 @@ class Config:
 
     @property
     def path(self) -> str:
-        return self.__config_path
+        return self.__config_path.name

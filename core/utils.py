@@ -4,8 +4,6 @@ import os
 
 from ruamel.yaml import YAML
 
-from config import Config
-
 
 def check_root(root_dir: str) -> str:
     if root_dir is None:
@@ -60,7 +58,3 @@ def find_matched_markdown(directory, name) -> str | None:
         if fnmatch.fnmatch(file, f'*{name}*') and file.endswith('.md'):
             return file
     return None
-
-
-root_dir = check_root(os.getenv('BLOG_ROOT'))
-config = Config()
