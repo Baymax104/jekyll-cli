@@ -33,6 +33,10 @@ class Item:
 
     @property
     def file_path(self) -> Path | None:
+        r"""
+        Returns the entire pathlib.Path of item's markdown file.
+        :return: the pathlib.Path object or None
+        """
         if self.__file_path is not None:
             return self.__file_path
         file_dir = self.__parent_dir if settings.mode == 'single' else self.__parent_dir / self.name
@@ -50,6 +54,13 @@ class Item:
 
     @property
     def path(self) -> Path | None:
+        r"""
+        Return the pathlib.Path of item
+
+        - 'single' mode: the method returns the entire Path of markdown file.
+        - 'item' mode: the method returns the entire Path of the item directory.
+        :return: the pathlib.Path object or None
+        """
         if self.__path is not None:
             return self.__path
 
