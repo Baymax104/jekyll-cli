@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-import fnmatch
 import os
 
 from ruamel.yaml import YAML
@@ -38,14 +37,14 @@ def read_markdown(md_file):
         content = f.read()
     # split the content
     parts = content.split('---\n', maxsplit=2)
-    yaml = YAML(typ='safe', pure=True)
+    yaml = YAML(pure=True)
     yaml_formatter = yaml.load(parts[1])
     article = parts[2]
     return yaml_formatter, article
 
 
 def write_markdown(md_file, yaml_formatter, article):
-    yaml = YAML(typ='rt', pure=True)
+    yaml = YAML(pure=True)
     with open(md_file, 'w', encoding='utf-8') as f:
         f.write('---\n')
         yaml.dump(yaml_formatter, f)
@@ -53,8 +52,3 @@ def write_markdown(md_file, yaml_formatter, article):
         f.write(article)
 
 
-def find_matched_markdown(directory, name) -> str | None:
-    for file in os.listdir(directory):
-        if fnmatch.fnmatch(file, f'*{name}*') and file.endswith('.md'):
-            return file
-    return None

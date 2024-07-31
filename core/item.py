@@ -106,7 +106,7 @@ class Item:
             formatter['tags'] = args.tags
 
         # output the formatter
-        yaml = YAML(typ='rt', pure=True)
+        yaml = YAML(pure=True)
         with open(file_path, 'w') as f:
             f.write('---\n')
             yaml.dump(formatter, f)
