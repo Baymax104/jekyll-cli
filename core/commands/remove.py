@@ -7,8 +7,8 @@ class RemoveCommand:
 
     def __init__(self, subparsers, blog):
         self.blog = blog
-        self.parser = subparsers.add_parser('remove', help='remove a post or draft', aliases=['r'])
-        action = self.parser.add_argument('name', help='post or draft name', type=str)
+        self.parser = subparsers.add_parser('remove', help='remove a post or draft.', aliases=['r'])
+        action = self.parser.add_argument('name', help='post or draft name.', type=str)
         action.completer = ChoicesCompleter(self.blog.articles)
         self.parser.set_defaults(execute=self.execute)
 
