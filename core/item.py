@@ -39,17 +39,19 @@ class Item:
         """
         if self.__file_path is not None:
             return self.__file_path
-        file_dir = self.__parent_dir if settings.mode == 'single' else self.__parent_dir / self.name
-        if not file_dir.exists():
+
+        # in single mode, file_path equals to path
+        if settings.mode == 'single':
+            return self.path
+
+        # in item mode, path is parent path of file_path
+        if not self.path:
             return None
+
         # find .md file
-        file: Path | None = None
-        for f in file_dir.iterdir():
-            pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.__type == BlogType.Post else rf'^{self.name}.md$'
-            if re.match(pattern, f.name) and f.is_file():
-                file = f
-                break
-        self.__file_path = file
+        pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.__type == BlogType.Post else rf'^{self.name}.md$'
+        matched = [f for f in self.path.iterdir() if re.match(pattern, f.name) and f.is_file()]
+        self.__file_path = matched[0] if len(matched) > 0 else None
         return self.__file_path
 
     @property
