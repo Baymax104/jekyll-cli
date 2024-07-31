@@ -19,11 +19,19 @@ class Blog:
             return []
 
         if settings.mode == 'item':
-            item_names = [f.name for f in post_dir.iterdir() if f.is_dir()]
+            item_paths = [f for f in post_dir.iterdir() if f.is_dir()]
         else:
-            item_names = [f.stem.split('-', 3)[3] for f in post_dir.iterdir() if f.is_file() and f.suffix == '.md']
+            item_paths = [f for f in post_dir.iterdir() if f.is_file() and f.suffix == '.md']
 
-        self.__post_items = [Item(item_name, BlogType.Post) for item_name in item_names]
+        self.__post_items = []
+        for item_path in item_paths:
+            if settings.mode == 'item':
+                name = item_path.name
+                path = post_dir / name
+            else:
+                name = item_path.stem.split('-', 3)[3]
+                path = item_path
+            self.__post_items.append(Item(name, BlogType.Post, path))
         return self.__post_items
 
     @property
@@ -36,11 +44,19 @@ class Blog:
             return []
 
         if settings.mode == 'item':
-            item_names = [f.name for f in draft_dir.iterdir() if f.is_dir()]
+            item_paths = [f for f in draft_dir.iterdir() if f.is_dir()]
         else:
-            item_names = [f.stem for f in draft_dir.iterdir() if f.is_file() and f.suffix == '.md']
+            item_paths = [f for f in draft_dir.iterdir() if f.is_file() and f.suffix == '.md']
 
-        self.__draft_items = [Item(item_name, BlogType.Draft) for item_name in item_names]
+        self.__draft_items = []
+        for item_path in item_paths:
+            if settings.mode == 'item':
+                name = item_path.name
+                path = draft_dir / name
+            else:
+                name = item_path.stem
+                path = item_path
+            self.__draft_items.append(Item(name, BlogType.Draft, path))
         return self.__draft_items
 
     @property

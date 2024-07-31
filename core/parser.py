@@ -8,6 +8,7 @@ from blog import Blog
 from commands.build import BuildCommand
 from commands.config import ConfigCommand
 from commands.draft import DraftCommand
+from commands.info import InfoCommand
 from commands.list import ListCommand
 from commands.open import OpenCommand
 from commands.post import PostCommand
@@ -34,6 +35,7 @@ class BlogParser:
         PublishCommand(subparsers, blog)
         UnpublishCommand(subparsers, blog)
         RemoveCommand(subparsers, blog)
+        InfoCommand(subparsers, blog)
         ConfigCommand(subparsers, settings.config, blog)
 
 
