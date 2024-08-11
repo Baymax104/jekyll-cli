@@ -36,11 +36,11 @@ class Config:
 
         # create config.yml
         if not self.__config_path.exists():
-            with open(self.__config_path, 'w') as f:
+            with open(self.__config_path, 'w', encoding='utf-8') as f:
                 yaml.dump(self.__DEFAULT_CONFIG, f)
 
         # read config
-        with open(self.__config_path, 'r') as f:
+        with open(self.__config_path, 'r', encoding='utf-8') as f:
             self.__config = yaml.load(f)
 
     @property

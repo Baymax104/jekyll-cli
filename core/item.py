@@ -109,7 +109,7 @@ class Item:
 
         # output the formatter
         yaml = YAML(pure=True)
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             f.write('---\n')
             yaml.dump(formatter, f)
             f.write('---\n')
