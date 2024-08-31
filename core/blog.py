@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-import settings
+import globals
 from item import Item, BlogType
 
 
@@ -14,18 +14,18 @@ class Blog:
         if self.__post_items is not None:
             return self.__post_items
 
-        post_dir = settings.root_dir / '_posts'
+        post_dir = globals.root_dir / '_posts'
         if not post_dir.is_dir():
             return []
 
-        if settings.mode == 'item':
+        if globals.mode == 'item':
             item_paths = [f for f in post_dir.iterdir() if f.is_dir()]
         else:
             item_paths = [f for f in post_dir.iterdir() if f.is_file() and f.suffix == '.md']
 
         self.__post_items = []
         for item_path in item_paths:
-            if settings.mode == 'item':
+            if globals.mode == 'item':
                 name = item_path.name
                 path = post_dir / name
             else:
@@ -39,18 +39,18 @@ class Blog:
         if self.__draft_items is not None:
             return self.__draft_items
 
-        draft_dir = settings.root_dir / '_drafts'
+        draft_dir = globals.root_dir / '_drafts'
         if not draft_dir.is_dir():
             return []
 
-        if settings.mode == 'item':
+        if globals.mode == 'item':
             item_paths = [f for f in draft_dir.iterdir() if f.is_dir()]
         else:
             item_paths = [f for f in draft_dir.iterdir() if f.is_file() and f.suffix == '.md']
 
         self.__draft_items = []
         for item_path in item_paths:
-            if settings.mode == 'item':
+            if globals.mode == 'item':
                 name = item_path.name
                 path = draft_dir / name
             else:
