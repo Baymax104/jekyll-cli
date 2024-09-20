@@ -2,7 +2,7 @@
 
 import os
 
-import globals
+from global_config import Config
 
 
 class ServeCommand:
@@ -14,13 +14,13 @@ class ServeCommand:
         self.parser.set_defaults(execute=self.execute)
 
     def execute(self, args):
-        os.chdir(globals.root_dir)
+        os.chdir(Config.root)
         command = 'bundle exec jekyll s'
         # draft option
         if args.draft:
             command += ' --drafts'
 
-        port = args.port if args.port else globals.config.port
+        port = args.port if args.port else Config.port
         if port:
             command += f' --port {port}'
         os.system(command)

@@ -3,7 +3,6 @@ import argparse
 
 import argcomplete
 
-import globals
 from blog import Blog
 from commands.build import BuildCommand
 from commands.config import ConfigCommand
@@ -36,7 +35,7 @@ class BlogParser:
         UnpublishCommand(subparsers, blog)
         RemoveCommand(subparsers, blog)
         InfoCommand(subparsers, blog)
-        ConfigCommand(subparsers, globals.config, blog)
+        ConfigCommand(subparsers, blog)
 
 
     def parse(self):

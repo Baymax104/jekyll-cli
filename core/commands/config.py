@@ -3,11 +3,13 @@
 import json
 import sys
 
+from global_config import Config
+
 
 class ConfigCommand:
 
-    def __init__(self, subparsers, config, blog):
-        self.config = config
+    def __init__(self, subparsers, blog):
+        self.config = Config
         self.blog = blog
         self.parser = subparsers.add_parser('config', help='configuration command.')
         subparsers = self.parser.add_subparsers(dest='config_command', title='config commands')

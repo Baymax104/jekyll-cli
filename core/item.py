@@ -8,7 +8,7 @@ from pathlib import Path
 
 from ruamel.yaml import YAML
 
-import globals
+from global_config import Config
 from utils import read_markdown, write_markdown
 
 
@@ -23,7 +23,7 @@ class Item:
         self.name = name
         self.__type = typ
         # _posts or _drafts
-        self.__parent_dir = globals.root_dir / typ.value
+        self.__parent_dir = Config.root / typ.value
         self.__path = path
         self.__file_path = file_path
 
@@ -41,7 +41,7 @@ class Item:
             return self.__file_path
 
         # in single mode, file_path equals to path
-        if globals.mode == 'single':
+        if Config.mode == 'single':
             return self.path
 
         # in item mode, path is parent path of file_path
@@ -68,7 +68,7 @@ class Item:
 
         item: Path | None = None
         for f in self.__parent_dir.iterdir():
-            if globals.mode == 'single':
+            if Config.mode == 'single':
                 pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.__type == BlogType.Post else rf'^{self.name}.md$'
                 if re.match(pattern, f.name) and f.is_file():
                     item = f
@@ -83,7 +83,7 @@ class Item:
 
     def create(self, args):
         # create item directories
-        if globals.mode == 'item':
+        if Config.mode == 'item':
             item_dir = self.__parent_dir / self.name
             assets_dir = item_dir / 'assets'
             assets_dir.mkdir(parents=True, exist_ok=True)
@@ -93,8 +93,8 @@ class Item:
         if self.__type == BlogType.Post:
             filename = f'{time.strftime("%Y-%m-%d")}-{filename}'
 
-        file_path = self.__parent_dir / filename if globals.mode == 'single' else self.__parent_dir / self.name / filename
-        formatter = globals.config.post_formatter if self.__type == BlogType.Post else globals.config.draft_formatter
+        file_path = self.__parent_dir / filename if Config.mode == 'single' else self.__parent_dir / self.name / filename
+        formatter = Config.get_formatter(self.__type.name)
 
         # fill current time in post_formatter
         if self.__type == BlogType.Post and not formatter['date']:
@@ -121,7 +121,7 @@ class Item:
     def remove(self):
         if not self.path:
             return
-        if globals.mode == 'single':
+        if Config.mode == 'single':
             self.path.unlink()
         else:
             shutil.rmtree(self.path)

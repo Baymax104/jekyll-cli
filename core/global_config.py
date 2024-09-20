@@ -1,14 +1,17 @@
 # -*- coding: UTF-8 -*-
+import os
 from pathlib import Path
 
 from ruamel.yaml import YAML
 
+import utils
 
-class Config:
+
+class __Config:
     __DEFAULT_CONFIG = {
-        'mode': 'single',
+        'mode': 'item',
         'port': None,  # default 4000
-        'formatter': {
+        'default_formatter': {
             'draft': {
                 'layout': 'post',
                 'title': None,
@@ -26,6 +29,7 @@ class Config:
     }
 
     def __init__(self):
+        self.__root = Path(utils.check_root(os.getenv('BLOG_ROOT')))
         power_jekyll_home = Path().home() / '.powerjekyll'
         self.__config_path = power_jekyll_home / 'config.yml'
         yaml = YAML(pure=True)
@@ -42,6 +46,10 @@ class Config:
         # read config
         with open(self.__config_path, 'r', encoding='utf-8') as f:
             self.__config = yaml.load(f)
+
+    @property
+    def root(self) -> Path:
+        return self.__root
 
     @property
     def content(self) -> dict:
@@ -74,16 +82,13 @@ class Config:
         with open(self.__config_path, 'w', encoding='utf-8') as f:
             yaml.dump(self.__config, f)
 
-    @property
-    def draft_formatter(self) -> dict | None:
-        formatter = self.__config.get('formatter')
-        return formatter.get('draft') if formatter else None
-
-    @property
-    def post_formatter(self) -> dict | None:
-        formatter = self.__config.get('formatter')
-        return formatter.get('post') if formatter else None
+    def get_formatter(self, typ):
+        formatter = self.__config.get('default_formatter')
+        return formatter.get(typ) if formatter else None
 
     @property
     def path(self) -> str:
         return self.__config_path.name
+
+
+Config = __Config()
