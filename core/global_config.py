@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ruamel.yaml import YAML
 
-import utils
+from utils import check_root
 
 
 class __Config:
@@ -29,7 +29,7 @@ class __Config:
     }
 
     def __init__(self):
-        self.__root = Path(utils.check_root(os.getenv('BLOG_ROOT')))
+        self.__root = Path(check_root(os.getenv('BLOG_ROOT')))
         power_jekyll_home = Path().home() / '.powerjekyll'
         self.__config_path = power_jekyll_home / 'config.yml'
         yaml = YAML(pure=True)
@@ -82,9 +82,9 @@ class __Config:
         with open(self.__config_path, 'w', encoding='utf-8') as f:
             yaml.dump(self.__config, f)
 
-    def get_formatter(self, typ):
+    def get_formatter(self, typ: str):
         formatter = self.__config.get('default_formatter')
-        return formatter.get(typ) if formatter else None
+        return formatter.get(typ.lower()) if formatter else None
 
     @property
     def path(self) -> str:

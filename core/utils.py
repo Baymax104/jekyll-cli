@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 
+from InquirerPy import prompt
 from ruamel.yaml import YAML
 
 
@@ -52,3 +53,23 @@ def write_markdown(md_file, yaml_formatter, article):
         f.write(article)
 
 
+def select_item_matches(items):
+    questions = [{
+        'type': 'list',
+        'name': 'select',
+        'message': f'Found {len(items)} matches, select one to continue:',
+        'choices': items
+    }]
+    return prompt(questions)['select']
+
+
+def confirm_removed_items(items) -> bool:
+    questions = [{
+        'type': 'confirm',
+        'name': 'confirm',
+        'message': f'Found {len(items)} matches, remove {len(items)} items:',
+        'default': False
+    }]
+    for i, item in enumerate(items):
+        print(f'{i + 1}. {item}')
+    return prompt(questions)['confirm']

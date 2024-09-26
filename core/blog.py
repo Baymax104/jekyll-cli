@@ -1,4 +1,7 @@
 # -*- coding: UTF-8 -*-
+from fnmatch import fnmatch
+from typing import List
+
 from global_config import Config
 from item import Item, BlogType
 
@@ -6,11 +9,11 @@ from item import Item, BlogType
 class Blog:
 
     def __init__(self):
-        self.__post_items: list[Item] | None = None
-        self.__draft_items: list[Item] | None = None
+        self.__post_items: List[Item] | None = None
+        self.__draft_items: List[Item] | None = None
 
     @property
-    def posts(self) -> list[Item]:
+    def posts(self) -> List[Item]:
         if self.__post_items is not None:
             return self.__post_items
 
@@ -35,7 +38,7 @@ class Blog:
         return self.__post_items
 
     @property
-    def drafts(self) -> list[Item]:
+    def drafts(self) -> List[Item]:
         if self.__draft_items is not None:
             return self.__draft_items
 
@@ -60,25 +63,22 @@ class Blog:
         return self.__draft_items
 
     @property
-    def articles(self) -> list[Item]:
+    def articles(self) -> List[Item]:
         return self.posts + self.drafts
 
     def refresh(self):
         self.__post_items = None
         self.__draft_items = None
 
-    def find(self, name: str, subset: BlogType | None = None) -> Item | None:
-        # TODO post的name会把draft的name覆盖，导致搜索不到draft
-        if subset is None:
-            items = self.articles
-        elif subset == BlogType.Post:
-            items = self.posts
-        else:
-            items = self.drafts
-        for item in items:
-            if name in item.name:
-                return item
-        return None
+    def find(self, pattern: str, subset: BlogType | None = None) -> List[Item]:
+        match subset:
+            case BlogType.Post:
+                items = self.posts
+            case BlogType.Draft:
+                items = self.drafts
+            case _:
+                items = self.articles
+        return [item for item in items if fnmatch(item.name, pattern)]
 
     def add(self, item: Item):
         if item.type == BlogType.Post:
