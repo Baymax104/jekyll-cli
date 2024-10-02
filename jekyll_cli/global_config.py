@@ -1,15 +1,15 @@
 # -*- coding: UTF-8 -*-
 import os
 from pathlib import Path
-from typing import Any, AnyStr as Str
+from typing import Any, Dict
 
 from ruamel.yaml import YAML
 
-from utils import check_root
+from .utils import check_root
 
 
 class __Config:
-    __DEFAULT_CONFIG = {
+    __DEFAULT_CONFIG__ = {
         'mode': 'item',
         'port': None,  # default 4000
         'default_formatter': {
@@ -41,22 +41,22 @@ class __Config:
         # create config.yml
         if not self.__config_path.exists():
             with open(self.__config_path, 'w', encoding='utf-8') as f:
-                yaml.dump(self.__DEFAULT_CONFIG, f)
+                yaml.dump(self.__DEFAULT_CONFIG__, f)
 
         # read config
         with open(self.__config_path, 'r', encoding='utf-8') as f:
-            self.__config = yaml.load(f)
+            self.__config: Dict[str, Any] = yaml.load(f)
 
     @property
     def root(self) -> Path:
         return self.__root
 
     @property
-    def content(self) -> dict[Str, Any]:
+    def content(self) -> Dict[str, Any]:
         return self.__config
 
     @property
-    def mode(self) -> Str:
+    def mode(self) -> str:
         mode = self.__config.get('mode')
         if not mode:
             raise ValueError('Key "mode" is missing in config.yml')
@@ -65,15 +65,15 @@ class __Config:
         return mode
 
     @mode.setter
-    def mode(self, mode: Str):
+    def mode(self, mode: str):
         self.__config['mode'] = mode
         yaml = YAML(pure=True)
         with open(self.__config_path, 'w', encoding='utf-8') as f:
             yaml.dump(self.__config, f)
 
     @property
-    def port(self) -> int | None:
-        return self.__config.get('port')
+    def port(self) -> int:
+        return self.__config.get('port', 4000)
 
     @port.setter
     def port(self, port: int):
@@ -82,7 +82,7 @@ class __Config:
         with open(self.__config_path, 'w', encoding='utf-8') as f:
             yaml.dump(self.__config, f)
 
-    def get_formatter(self, type_: Str):
+    def get_formatter(self, type_: str):
         formatter = self.__config.get('default_formatter')
         return formatter.get(type_.lower()) if formatter else None
 

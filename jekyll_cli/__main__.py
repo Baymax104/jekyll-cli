@@ -1,11 +1,10 @@
 #!/usr/bin/python3
-# PYTHON_ARGCOMPLETE_OK
 # -*- coding: UTF-8 -*-
 import typer
 
-from basic_commands import app
+from .basic_commands import app
 
 try:
-    app()
+    app(prog_name='blog')
 except KeyboardInterrupt:
     raise typer.Exit()

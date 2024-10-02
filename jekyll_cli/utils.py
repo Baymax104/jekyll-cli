@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 from pathlib import Path
-from typing import Any, Tuple, Dict, AnyStr as Str
+from typing import Any, Tuple, Dict
 
 from InquirerPy import prompt
 from rich.console import Console
@@ -15,7 +15,7 @@ print = __console.print
 rule = __console.rule
 
 
-def check_root(root_dir: Str) -> Str:
+def check_root(root_dir: str) -> str:
     if root_dir is None:
         print('BLOG_ROOT environment variable is not set')
         raise Exit(1)
@@ -51,7 +51,7 @@ def print_info(item):
     print(table)
 
 
-def read_markdown(md_file: Path) -> Tuple[Dict[Str, Any], Str]:
+def read_markdown(md_file: Path) -> Tuple[Dict[str, Any], str]:
     with open(md_file, 'r', encoding='utf-8') as f:
         content = f.read()
     # split the content
@@ -62,7 +62,7 @@ def read_markdown(md_file: Path) -> Tuple[Dict[Str, Any], Str]:
     return yaml_formatter, article
 
 
-def write_markdown(md_file: Path, yaml_formatter: Dict[Str, Any], article: Str):
+def write_markdown(md_file: Path, yaml_formatter: Dict[str, Any], article: str):
     yaml = YAML(pure=True)
     with open(md_file, 'w', encoding='utf-8') as f:
         f.write('---\n')

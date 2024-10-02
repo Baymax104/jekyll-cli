@@ -2,8 +2,8 @@
 from fnmatch import fnmatch
 from typing import List
 
-from global_config import Config
-from item import Item, BlogType
+from .global_config import Config
+from .item import Item, BlogType
 
 
 class _Blog:

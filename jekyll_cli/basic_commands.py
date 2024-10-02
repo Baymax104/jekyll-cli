@@ -1,22 +1,13 @@
 # -*- coding: UTF-8 -*-
-import os
 from typing import Annotated, List
 
 from typer import Typer, Option, Argument
 
-import config_commands
-from blog import Blog
-from global_config import Config
-from item import Item, BlogType
-from utils import (
-    print,
-    rule,
-    select_item_matches,
-    print_table,
-    Progress,
-    print_info,
-    confirm_removed_items
-)
+from .blog import Blog
+from .config_commands import app as config_app
+from .global_config import Config
+from .item import Item, BlogType
+from .utils import *
 
 app = Typer(
     no_args_is_help=True,
@@ -24,23 +15,21 @@ app = Typer(
     rich_markup_mode='rich'
 )
 
-app.add_typer(config_commands.app, rich_help_panel='Configuration')
+app.add_typer(config_app, rich_help_panel='Configuration')
 
 
 @app.command(rich_help_panel='Deployment')
 def serve(
     draft: Annotated[bool, Option('--draft', '-d', help='Start blog server with drafts.')] = False,
-    port: Annotated[int, Option(help='Listen on the given port.')] = 4000
+    port: Annotated[int, Option(help='Listen on the given port.')] = Config.port
 ):
     """Start blog server locally through jekyll."""
     os.chdir(Config.root)
-    command = 'bundle exec jekyll s'
+    command = 'bundle exec jekyll serve'
     # draft option
     if draft:
         command += ' --drafts'
-    port = port if port else Config.port
-    if port:
-        command += f' --port {port}'
+    command += f' --port {port}'
     os.system(command)
 
 

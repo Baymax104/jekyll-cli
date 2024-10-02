@@ -4,9 +4,9 @@ from typing import Annotated
 from rich import print_json
 from typer import Typer, Option
 
-from blog import Blog
-from global_config import Config
-from utils import print
+from .blog import Blog
+from .global_config import Config
+from .utils import print
 
 app = Typer(
     name='config',

@@ -1,110 +1,257 @@
 # Power Jekyll
 
-`Power Jekyll`是一个用于管理Jekyll博客的PowerShell模块，它通过`blog`命令提供了一组命令，可以方便地进行博客的本地开发、创建、发布等操作
+Jekyll Blog CLI Tool.
 
-## 功能
+**Usage**:
 
-通过`blog`命令提供了以下功能：
-
-- `serve`: 在本地通过Jekyll启动博客服务器
-- `list`: 列出所有的博文和草稿
-- `open`: 在编辑器中打开指定的博文或草稿
-- `remove`: 删除一个博文或草稿
-- `draft`: 创建一个位于`_drafts`目录下的新草稿
-- `post`: 创建一个位于`_posts`目录下的新博文
-- `publish`: 发布一个草稿，将其移动到`_posts`目录下
-- `unpublish`: 撤销一篇已发布的博文，将其移动回`_drafts`目录
-
-其他功能
-
-- 自动补全子命令
-- 自动补全命令相关文件名
-
-## 安装
-
-在使用之前，你需要额外安装一些依赖，可以在你的Python环境中进入到本程序目录，使用下面的命令安装
-
-```powershell
-pip install -r requirements.txt
+```console
+$ blog [OPTIONS] COMMAND [ARGS]...
 ```
 
-安装完成后，你可以在PowerShell中通过`Import-Module`命令导入模块，类似下面的命令
+**Options**:
 
-```powershell
-Import-Module -Name "本程序目录的绝对路径"
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `build`: Build jekyll site.
+* `config`: Configuration Subcommands.
+* `draft`: Create a draft.
+* `info`: Show info about post or draft.
+* `list`: List all posts and drafts.
+* `open`: Open post or draft in editor.
+* `post`: Create a post.
+* `publish`: Publish a draft.
+* `remove`: Remove a post or draft.
+* `serve`: Start blog server locally through jekyll.
+* `unpublish`: Unpublish a post.
+
+## `blog build`
+
+Build jekyll site.
+
+**Usage**:
+
+```console
+$ blog build [OPTIONS]
 ```
 
-或将程序目录移动到PowerShell的模块安装目录中，安装目录路径可通过`PSModulePath`环境变量查看
+**Options**:
 
-移动后，PowerShell会自动加载模块，或通过`Import-Module`命令导入
+* `-d, --draft`: Build including drafts.
+* `--help`: Show this message and exit.
 
-```powershell
-Import-Module PowerJekyll
+## `blog config`
+
+Configuration Subcommands.
+
+**Usage**:
+
+```console
+$ blog config [OPTIONS] COMMAND [ARGS]...
 ```
 
-最后需要**设置环境变量**`BLOG_ROOT`为你的博客目录，你可以在系统控制面板中添加，也可在PowerShell中执行下面的命令设置环境变量
+**Options**:
 
-```powershell
-[Environment]::SetEnvironmentVariable('BLOG_ROOT', '你的博客目录全路径', 'User')
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `list`: List all configurations.
+* `set`: Set configurations.
+
+### `blog config list`
+
+List all configurations.
+
+**Usage**:
+
+```console
+$ blog config list [OPTIONS]
 ```
 
-## 关于config.yml
+**Options**:
 
-`config.yml`中可以配置博客的格式头`yaml fomatter`，在使用`post`、`draft`命令时，会使用配置的格式头初始化文档
+* `--help`: Show this message and exit.
 
-```yaml
-# yaml formatter
-formatter:
-  draft:
-    layout: post
-    title:
-    categories: []
-    tags: []
+### `blog config set`
 
-  post:
-    layout: post
-    title:
-    categories: []
-    tags: []
-    date:  
+Set configurations.
+
+**Usage**:
+
+```console
+$ blog config set [OPTIONS]
 ```
 
-## 使用示例
+**Options**:
 
-下面是一些使用示例：
+* `--mode TEXT`: Management mode.
+* `--port INTEGER`: Listen on the given port.  [default: 4000]
+* `--help`: Show this message and exit.
 
+## `blog draft`
+
+Create a draft.
+
+**Usage**:
+
+```console
+$ blog draft [OPTIONS] NAME
 ```
-# 启动本地服务器
-blog serve
-blog s
 
-# 列出所有的博文和草稿
-blog list
-blog l
+**Arguments**:
 
-# 创建一个新的草稿
-blog draft my-draft
-blog d my-draft
-blog do my-draft  # 创建草稿后自动打开
+* `NAME`: Name of draft item.  [required]
 
-# 创建一个新的博文
-blog post my-post
-blog p my-post
-blog po my-post  # 创建博文后自动打开
+**Options**:
 
-# 删除一个草稿或博文
-blog remove my-file
-blog r my-file
+* `-t, --title TEXT`: Title of draft.
+* `-c, --class TEXT`: Categories of draft.
+* `-g, --tag TEXT`: Tags of draft.
+* `-o, --open`: Open draft after creation.
+* `--help`: Show this message and exit.
 
-# 打开指定的博文或草稿
-blog open my-post
-blog o my-post
+## `blog info`
 
-# 发布一个草稿
-blog publish my-draft
-blog pub my-draft
+Show info about post or draft.
 
-# 撤销发布一篇已发布的博文
-blog unpublish my-post
-blog unpub my-post
+**Usage**:
+
+```console
+$ blog info [OPTIONS] PATTERN
 ```
+
+**Arguments**:
+
+* `PATTERN`: Pattern of post or draft name.  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+## `blog list`
+
+List all posts and drafts.
+
+**Usage**:
+
+```console
+$ blog list [OPTIONS]
+```
+
+**Options**:
+
+* `-d, --draft`: List only all drafts.
+* `-p, --post`: List only all posts.
+* `--help`: Show this message and exit.
+
+## `blog open`
+
+Open post or draft in editor.
+
+**Usage**:
+
+```console
+$ blog open [OPTIONS] PATTERN
+```
+
+**Arguments**:
+
+* `PATTERN`: Pattern of post or draft name.  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+## `blog post`
+
+Create a post.
+
+**Usage**:
+
+```console
+$ blog post [OPTIONS] NAME
+```
+
+**Arguments**:
+
+* `NAME`: Name of post item.  [required]
+
+**Options**:
+
+* `-t, --title TEXT`: Title of post.
+* `-c, --class TEXT`: Categories of post.
+* `-g, --tag TEXT`: Tags of post.
+* `-o, --open`: Open post after creation.
+* `--help`: Show this message and exit.
+
+## `blog publish`
+
+Publish a draft.
+
+**Usage**:
+
+```console
+$ blog publish [OPTIONS] PATTERN
+```
+
+**Arguments**:
+
+* `PATTERN`: Pattern of draft name.  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+## `blog remove`
+
+Remove a post or draft.
+
+**Usage**:
+
+```console
+$ blog remove [OPTIONS] PATTERN
+```
+
+**Arguments**:
+
+* `PATTERN`: Pattern of post or draft name.  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+## `blog serve`
+
+Start blog server locally through jekyll.
+
+**Usage**:
+
+```console
+$ blog serve [OPTIONS]
+```
+
+**Options**:
+
+* `-d, --draft`: Start blog server with drafts.
+* `--port INTEGER`: Listen on the given port.  [default: 4000]
+* `--help`: Show this message and exit.
+
+## `blog unpublish`
+
+Unpublish a post.
+
+**Usage**:
+
+```console
+$ blog unpublish [OPTIONS] PATTERN
+```
+
+**Arguments**:
+
+* `PATTERN`: Pattern of post name.  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
