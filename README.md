@@ -1,4 +1,4 @@
-# Power Jekyll
+# Jekyll CLI
 
 Jekyll Blog CLI Tool.
 
