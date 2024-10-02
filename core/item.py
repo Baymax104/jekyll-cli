@@ -19,11 +19,11 @@ class BlogType(Enum):
 
 class Item:
 
-    def __init__(self, name: str, typ: BlogType, path: Path | None = None, file_path: Path | None = None):
+    def __init__(self, name: str, type_: BlogType, path: Path | None = None, file_path: Path | None = None):
         self.name = name
-        self.__type = typ
+        self.__type = type_
         # _posts or _drafts
-        self.__parent_dir = Config.root / typ.value
+        self.__parent_dir = Config.root / type_.value
         self.__path = path
         self.__file_path = file_path
 
@@ -42,13 +42,14 @@ class Item:
 
         # in single mode, file_path equals to path
         if Config.mode == 'single':
-            return self.path
+            self.__file_path = self.path
+            return self.__file_path
 
         # in item mode, path is parent path of file_path
         if not self.path:
             return None
 
-        # find .md file
+        # find .md file for item mode
         pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.__type == BlogType.Post else rf'^{self.name}.md$'
         matched = [f for f in self.path.iterdir() if re.match(pattern, f.name) and f.is_file()]
         self.__file_path = matched[0] if len(matched) > 0 else None
@@ -66,22 +67,21 @@ class Item:
         if self.__path is not None:
             return self.__path
 
-        item: Path | None = None
-        for f in self.__parent_dir.iterdir():
+        item_path: Path | None = None
+        for path in self.__parent_dir.iterdir():
             if Config.mode == 'single':
                 pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.__type == BlogType.Post else rf'^{self.name}.md$'
-                if re.match(pattern, f.name) and f.is_file():
-                    item = f
-                    break
+                is_type_valid = path.is_file()
             else:
                 pattern = rf'^{self.name}$'
-                if re.match(pattern, f.name) and f.is_dir():
-                    item = f
-                    break
-        self.__path = item
+                is_type_valid = path.is_dir()
+            if re.match(pattern, path.name) and is_type_valid:
+                item_path = path
+                break
+        self.__path = item_path
         return self.__path
 
-    def create(self, args):
+    def create(self, title: str = None, class_: list[str] = None, tag: list[str] = None):
         # create item directories
         if Config.mode == 'item':
             item_dir = self.__parent_dir / self.name
@@ -100,12 +100,12 @@ class Item:
         if self.__type == BlogType.Post and not formatter['date']:
             formatter['date'] = time.strftime("%Y-%m-%d %H:%M")
         # fill formatter
-        if args.title is not None:
-            formatter['title'] = args.title
-        if args.cats is not None:
-            formatter['categories'] = args.cats
-        if args.tags is not None:
-            formatter['tags'] = args.tags
+        if title is not None:
+            formatter['title'] = title
+        if class_ is not None:
+            formatter['categories'] = class_
+        if tag is not None:
+            formatter['tags'] = tag
 
         # output the formatter
         yaml = YAML(pure=True)

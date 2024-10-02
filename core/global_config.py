@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 from pathlib import Path
+from typing import Any, AnyStr as Str
 
 from ruamel.yaml import YAML
 
@@ -35,8 +36,7 @@ class __Config:
         yaml = YAML(pure=True)
 
         # create app home
-        if not power_jekyll_home.exists():
-            power_jekyll_home.mkdir(exist_ok=True)
+        power_jekyll_home.mkdir(exist_ok=True)
 
         # create config.yml
         if not self.__config_path.exists():
@@ -52,11 +52,11 @@ class __Config:
         return self.__root
 
     @property
-    def content(self) -> dict:
+    def content(self) -> dict[Str, Any]:
         return self.__config
 
     @property
-    def mode(self) -> str:
+    def mode(self) -> Str:
         mode = self.__config.get('mode')
         if not mode:
             raise ValueError('Key "mode" is missing in config.yml')
@@ -65,14 +65,14 @@ class __Config:
         return mode
 
     @mode.setter
-    def mode(self, mode: str):
+    def mode(self, mode: Str):
         self.__config['mode'] = mode
         yaml = YAML(pure=True)
         with open(self.__config_path, 'w', encoding='utf-8') as f:
             yaml.dump(self.__config, f)
 
     @property
-    def port(self):
+    def port(self) -> int | None:
         return self.__config.get('port')
 
     @port.setter
@@ -82,13 +82,14 @@ class __Config:
         with open(self.__config_path, 'w', encoding='utf-8') as f:
             yaml.dump(self.__config, f)
 
-    def get_formatter(self, typ: str):
+    def get_formatter(self, type_: Str):
         formatter = self.__config.get('default_formatter')
-        return formatter.get(typ.lower()) if formatter else None
-
-    @property
-    def path(self) -> str:
-        return self.__config_path.name
+        return formatter.get(type_.lower()) if formatter else None
 
 
 Config = __Config()
+
+if __name__ == '__main__':
+    import typer
+
+    print(typer.get_app_dir('powerjekyll'))

@@ -6,7 +6,7 @@ from global_config import Config
 from item import Item, BlogType
 
 
-class Blog:
+class _Blog:
 
     def __init__(self):
         self.__post_items: List[Item] | None = None
@@ -91,3 +91,6 @@ class Blog:
             self.posts.remove(item)
         else:
             self.drafts.remove(item)
+
+
+Blog = _Blog()

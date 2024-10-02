@@ -1,12 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # PYTHON_ARGCOMPLETE_OK
 # -*- coding: UTF-8 -*-
-from blog import Blog
-from parser import BlogParser
+import typer
+
+from basic_commands import app
 
 try:
-    blog = Blog()
-    parser = BlogParser(blog)
-    parser.parse()
+    app()
 except KeyboardInterrupt:
-    pass  # ignored
+    raise typer.Exit()
