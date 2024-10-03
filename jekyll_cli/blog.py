@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from fnmatch import fnmatch
-from typing import List
+from typing import List, Dict
 
 from .config import Config
 from .item import Item, BlogType
@@ -9,52 +9,30 @@ from .item import Item, BlogType
 class __Blog:
 
     def __init__(self):
-        self.__post_items: List[Item] | None = None
-        self.__draft_items: List[Item] | None = None
+        self.__post_items: Dict[str, Item] | None = None
+        self.__draft_items: Dict[str, Item] | None = None
 
     @property
     def posts(self) -> List[Item]:
-        if self.__post_items is not None:
-            return self.__post_items
-
-        post_dir = Config.root / '_posts'
-        if not post_dir.is_dir():
-            return []
-
-        if Config.mode == 'item':
-            item_paths = [f for f in post_dir.iterdir() if f.is_dir()]
-        else:
-            item_paths = [f for f in post_dir.iterdir() if f.is_file() and f.suffix == '.md']
-
-        self.__post_items = []
-        for item_path in item_paths:
-            name = item_path.name if Config.mode == 'item' else item_path.stem.split('-', 3)[3]
-            self.__post_items.append(Item(name, BlogType.Post, item_path))
-        return self.__post_items
+        return list(self.__post_items.values() if self.__post_items else self.__posts_dict.values())
 
     @property
     def drafts(self) -> List[Item]:
-        if self.__draft_items is not None:
-            return self.__draft_items
-
-        draft_dir = Config.root / '_drafts'
-        if not draft_dir.is_dir():
-            return []
-
-        if Config.mode == 'item':
-            item_paths = [f for f in draft_dir.iterdir() if f.is_dir()]
-        else:
-            item_paths = [f for f in draft_dir.iterdir() if f.is_file() and f.suffix == '.md']
-
-        self.__draft_items = []
-        for item_path in item_paths:
-            name = item_path.name if Config.mode == 'item' else item_path.stem
-            self.__draft_items.append(Item(name, BlogType.Draft, item_path))
-        return self.__draft_items
+        return list(self.__draft_items.values() if self.__draft_items else self.__drafts_dict.values())
 
     @property
     def articles(self) -> List[Item]:
         return self.posts + self.drafts
+
+    @property
+    def __posts_dict(self) -> Dict[str, Item]:
+        self.__post_items = self.__initialize_items(BlogType.Post)
+        return self.__post_items
+
+    @property
+    def __drafts_dict(self) -> Dict[str, Item]:
+        self.__draft_items = self.__initialize_items(BlogType.Draft)
+        return self.__draft_items
 
     def refresh(self):
         self.__post_items = None
@@ -63,24 +41,49 @@ class __Blog:
     def find(self, pattern: str, subset: BlogType | None = None) -> List[Item]:
         match subset:
             case BlogType.Post:
-                items = self.posts
+                items = self.__posts_dict
             case BlogType.Draft:
-                items = self.drafts
+                items = self.__posts_dict
             case _:
-                items = self.articles
-        return [item for item in items if fnmatch(item.name, pattern)]
+                items = dict(self.__posts_dict, **self.__drafts_dict)
+
+        # precise match
+        item = items.get(pattern)
+        if item is not None:
+            return [item]
+
+        # fuzzy match
+        return [item for name, item in items.items() if fnmatch(name, f'*{pattern}*')]
 
     def add(self, item: Item):
-        if item.type == BlogType.Post:
-            self.posts.append(item)
-        else:
-            self.drafts.append(item)
+        items = self.__post_items if item.type == BlogType.Post else self.__draft_items
+        if item.name in items:
+            raise KeyError(f'Exists duplicated key: {item.name}.')
+        items[item.name] = item
 
     def remove(self, item: Item):
-        if item.type == BlogType.Post:
-            self.posts.remove(item)
+        items = self.__post_items if item.type == BlogType.Post else self.__draft_items
+        if item.name not in items:
+            raise KeyError(f'Key {item.name} is missing.')
+        del items[item.name]
+
+    def __initialize_items(self, type_: BlogType) -> Dict[str, Item]:
+        parent_dir = Config.root / type_.value
+        if not parent_dir.is_dir():
+            raise ValueError(f'{parent_dir} is not a directory.')
+
+        if Config.mode == 'item':
+            item_paths = [f for f in parent_dir.iterdir() if f.is_dir()]
         else:
-            self.drafts.remove(item)
+            item_paths = [f for f in parent_dir.iterdir() if f.is_file() and f.suffix == '.md']
+
+        items = {}
+        for item_path in item_paths:
+            name = item_path.name if Config.mode == 'item' else item_path.stem
+            if name in items:
+                raise KeyError(f'Exists duplicated key: {name}.')
+            items[name] = Item(name, type_, item_path)
+        return items
 
 
 Blog = __Blog()

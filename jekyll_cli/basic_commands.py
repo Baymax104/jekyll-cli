@@ -46,9 +46,9 @@ def build(draft: Annotated[bool, Option(help='Build including drafts.')] = Confi
 
 
 @app.command(rich_help_panel='Operation')
-def info(pattern: Annotated[str, Argument(help='Pattern of post or draft name.')]):
+def info(name: Annotated[str, Argument(help='Name of post or draft.')]):
     """Show info about post or draft."""
-    items = Blog.find(pattern)
+    items = Blog.find(name)
     if len(items) == 0:
         print('[bold red]No such item.')
         return
@@ -74,9 +74,9 @@ def list_items(
 
 
 @app.command(name='open', rich_help_panel='Operation')
-def open_item(pattern: Annotated[str, Argument(help='Pattern of post or draft name.')]):
+def open_item(name: Annotated[str, Argument(help='Name of post or draft.')]):
     """Open post or draft in editor."""
-    items = Blog.find(pattern)
+    items = Blog.find(name)
     if len(items) == 0:
         print(f'[bold red]No such item.')
         return
@@ -123,11 +123,11 @@ def post(
 
 
 @app.command(rich_help_panel='Operation')
-def remove(pattern: Annotated[str, Argument(help='Pattern of post or draft name.')]):
+def remove(name: Annotated[str, Argument(help='Name of post or draft.')]):
     """Remove a post or draft."""
-    items = Blog.find(pattern)
+    items = Blog.find(name)
     if len(items) == 0:
-        print(f'[bold red]No such item: {pattern}')
+        print(f'[bold red]No such item.')
         return
 
     for i, item in enumerate(items):
@@ -140,9 +140,9 @@ def remove(pattern: Annotated[str, Argument(help='Pattern of post or draft name.
 
 
 @app.command(rich_help_panel='Operation')
-def publish(pattern: Annotated[str, Argument(help='Pattern of draft name.')]):
+def publish(name: Annotated[str, Argument(help='Name of draft.')]):
     """Publish a draft."""
-    items = Blog.find(pattern, BlogType.Draft)
+    items = Blog.find(name, BlogType.Draft)
 
     if len(items) == 0:
         rule('[bold green]Drafts')
@@ -156,9 +156,9 @@ def publish(pattern: Annotated[str, Argument(help='Pattern of draft name.')]):
 
 
 @app.command(rich_help_panel='Operation')
-def unpublish(pattern: Annotated[str, Argument(help='Pattern of post name.')]):
+def unpublish(name: Annotated[str, Argument(help='Name of post.')]):
     """Unpublish a post."""
-    items = Blog.find(pattern, BlogType.Post)
+    items = Blog.find(name, BlogType.Post)
 
     if len(items) == 0:
         rule('[bold green]Posts')
