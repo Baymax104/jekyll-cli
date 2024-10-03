@@ -27,7 +27,7 @@ def set_config(
     key: Annotated[str, Argument(help='Configuration key using dot-notation.')],
     value: Annotated[Any, Argument(help='Configuration value.', parser=convert_literal)],
 ):
-    """Set a configurations"""
+    """Set a configuration."""
     check_configuration(key, value)
     Config.update(key, value)
     Blog.refresh()

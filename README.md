@@ -1,6 +1,6 @@
 # Jekyll CLI
 
-Jekyll Blog CLI Tool.
+**Jekyll Blog CLI Tool.**
 
 **Usage**:
 
@@ -38,7 +38,7 @@ $ blog build [OPTIONS]
 
 **Options**:
 
-* `-d, --draft`: Build including drafts.
+* `--draft / --no-draft`: Build including drafts.  [default: no-draft]
 * `--help`: Show this message and exit.
 
 ## `blog config`
@@ -58,7 +58,7 @@ $ blog config [OPTIONS] COMMAND [ARGS]...
 **Commands**:
 
 * `list`: List all configurations.
-* `set`: Set configurations.
+* `set`: Set a configuration.
 
 ### `blog config list`
 
@@ -76,18 +76,21 @@ $ blog config list [OPTIONS]
 
 ### `blog config set`
 
-Set configurations.
+Set a configuration.
 
 **Usage**:
 
 ```console
-$ blog config set [OPTIONS]
+$ blog config set [OPTIONS] KEY VALUE
 ```
+
+**Arguments**:
+
+* `KEY`: Configuration key using dot-notation.  [required]
+* `VALUE`: Configuration value.  [required]
 
 **Options**:
 
-* `--mode TEXT`: Management mode.
-* `--port INTEGER`: Listen on the given port.  [default: 4000]
 * `--help`: Show this message and exit.
 
 ## `blog draft`
@@ -234,8 +237,8 @@ $ blog serve [OPTIONS]
 
 **Options**:
 
-* `-d, --draft`: Start blog server with drafts.
-* `--port INTEGER`: Listen on the given port.  [default: 4000]
+* `--draft / --no-draft`: Start blog server with drafts.  [default: no-draft]
+* `--port INTEGER`: Listen on the given port.  [default: 4001]
 * `--help`: Show this message and exit.
 
 ## `blog unpublish`
