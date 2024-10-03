@@ -75,6 +75,11 @@ class __Config:
         OC.update(self.__config, key, value, merge=False)
         OC.save(self.__config, self.__config_path)
 
+    def merge(self, config: Dict):
+        other_config = OC.create(config)
+        self.__config = OC.unsafe_merge(self.__config, other_config)
+        OC.save(self.__config, self.__config_path)
+
     @property
     def json(self) -> str:
         return json.dumps(OC.to_container(self.__config, resolve=True))

@@ -86,7 +86,8 @@ class Item:
         if Config.mode == 'item':
             item_dir = self.__parent_dir / self.name
             assets_dir = item_dir / 'assets'
-            assets_dir.mkdir(parents=True, exist_ok=True)
+            item_dir.mkdir(exist_ok=True)
+            assets_dir.mkdir(exist_ok=True)
 
         # .md file processing
         filename = self.name + '.md'

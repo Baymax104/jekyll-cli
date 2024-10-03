@@ -8,7 +8,7 @@ from .blog import Blog
 from .config import Config
 from .config_commands import app as config_app
 from .item import Item, BlogType
-from .utils import *
+from .prompt import *
 
 app = Typer(
     no_args_is_help=True,
@@ -130,7 +130,9 @@ def remove(pattern: Annotated[str, Argument(help='Pattern of post or draft name.
         print(f'[bold red]No such item: {pattern}')
         return
 
-    if confirm_removed_items(items):
+    for i, item in enumerate(items):
+        print(f'{i + 1}. {item}')
+    if confirm(f'Found {len(items)} matches, remove above items?'):
         for item in items:
             item.remove()
             Blog.remove(item)
@@ -167,3 +169,24 @@ def unpublish(pattern: Annotated[str, Argument(help='Pattern of post name.')]):
     item = items[0] if len(items) == 1 else select_item_matches(items)
     item.unpublish()
     print(f'[bold green]Post [#ffb300]"{item.name}"[/] unpublished as [#ffb300]"{item.file_path}"[/]')
+
+
+@app.command(rich_help_panel='Configuration')
+def init():
+    """Initialize the application interactively."""
+    print('[bold green]Welcome to the Jekyll CLI application!:wave::wave::wave:')
+    print("Let's set up your basic configuration.:wink:")
+
+    root = input_directory_path('Please enter the root path of your blog:')
+    mode = select_mode()
+
+    rule()
+    print('You have entered the following configurations:')
+    print(f'[green]Blog root path[/]: {root}')
+    print(f'[green]Management mode[/]: {mode}')
+    if confirm('Confirm your basic configurations?', default=True):
+        Config.merge({'root': str(root), 'mode': mode})
+        print('[bold green]Basic configuration set up successfully!')
+        print('[bold]Type "--help" for more information.')
+    else:
+        print('[bold red]Aborted.')

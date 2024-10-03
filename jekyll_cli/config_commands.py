@@ -6,7 +6,8 @@ from typer import Typer, Argument
 
 from .blog import Blog
 from .config import Config
-from .utils import print, convert_literal, check_configuration
+from .prompt import print
+from .utils import convert_literal, check_configuration
 
 app = Typer(
     name='config',
