@@ -1,12 +1,11 @@
 # -*- coding: UTF-8 -*-
+import asyncio
 import os.path
 import re
 import shutil
 import time
 from enum import Enum
 from pathlib import Path
-
-from ruamel.yaml import YAML
 
 from .config import Config
 from .utils import read_markdown, write_markdown
@@ -97,7 +96,7 @@ class Item:
         file_path = self.__parent_dir / filename if Config.mode == 'single' else self.__parent_dir / self.name / filename
         formatter = Config.get_formatter(self.__type.name)
 
-        # fill current time in post_formatter
+        # fill current time
         if self.__type == BlogType.Post and not formatter['date']:
             formatter['date'] = time.strftime("%Y-%m-%d %H:%M")
         # fill formatter
@@ -108,12 +107,7 @@ class Item:
         if tag is not None:
             formatter['tags'] = tag
 
-        # output the formatter
-        yaml = YAML(pure=True)
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write('---\n')
-            yaml.dump(formatter, f)
-            f.write('---\n')
+        asyncio.run(write_markdown(file_path, formatter))
 
     def open(self):
         if self.file_path:
@@ -137,9 +131,9 @@ class Item:
         src_parent_dir = self.__parent_dir
         src_path = self.path
         src_file_path = self.file_path
-        dest_parent_dir = Path(str(src_parent_dir).replace('_drafts', '_posts', 1))
-        dest_path = Path(str(src_path).replace('_drafts', '_posts', 1))
-        dest_file_path = Path(str(src_file_path).replace('_drafts', '_posts', 1))
+        dest_parent_dir = Config.root / '_posts'
+        dest_path = dest_parent_dir / src_path.relative_to(src_parent_dir)
+        dest_file_path = dest_parent_dir / src_file_path.relative_to(src_parent_dir)
 
         # move item
         shutil.move(src_path, dest_path)
@@ -152,9 +146,12 @@ class Item:
         self.__file_path = dest_file_path
 
         # update .md file
-        formatter, article = read_markdown(dest_file_path)
-        formatter['date'] = time.strftime("%Y-%m-%d %H:%M")
-        write_markdown(dest_file_path, formatter, article)
+        async def update_file():
+            formatter, article = await read_markdown(dest_file_path)
+            formatter['date'] = time.strftime("%Y-%m-%d %H:%M")
+            await write_markdown(dest_file_path, formatter, article)
+
+        asyncio.run(update_file())
         self.__type = BlogType.Post
 
     def unpublish(self):
@@ -167,9 +164,9 @@ class Item:
         src_parent_dir = self.__parent_dir
         src_path = self.path
         src_file_path = self.file_path
-        dest_parent_dir = Path(str(src_parent_dir).replace('_posts', '_drafts', 1))
-        dest_path = Path(str(src_path).replace('_posts', '_drafts', 1))
-        dest_file_path = Path(str(src_file_path).replace('_posts', '_drafts', 1))
+        dest_parent_dir = Config.root / '_drafts'
+        dest_path = dest_parent_dir / src_path.relative_to(src_parent_dir)
+        dest_file_path = dest_parent_dir / src_file_path.relative_to(src_parent_dir)
 
         # move item
         shutil.move(src_path, dest_path)
@@ -182,9 +179,13 @@ class Item:
         self.__file_path = dest_file_path
 
         # update .md file
-        formatter, article = read_markdown(dest_file_path)
-        del formatter['date']
-        write_markdown(dest_file_path, formatter, article)
+        async def update_file():
+            formatter, article = await read_markdown(dest_file_path)
+            if 'date' in formatter:
+                del formatter['date']
+            await write_markdown(dest_file_path, formatter, article)
+
+        asyncio.run(update_file())
         self.__type = BlogType.Draft
 
     def __str__(self):

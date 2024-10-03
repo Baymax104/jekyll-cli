@@ -28,13 +28,8 @@ class __Blog:
 
         self.__post_items = []
         for item_path in item_paths:
-            if Config.mode == 'item':
-                name = item_path.name
-                path = post_dir / name
-            else:
-                name = item_path.stem.split('-', 3)[3]
-                path = item_path
-            self.__post_items.append(Item(name, BlogType.Post, path))
+            name = item_path.name if Config.mode == 'item' else item_path.stem.split('-', 3)[3]
+            self.__post_items.append(Item(name, BlogType.Post, item_path))
         return self.__post_items
 
     @property
@@ -53,13 +48,8 @@ class __Blog:
 
         self.__draft_items = []
         for item_path in item_paths:
-            if Config.mode == 'item':
-                name = item_path.name
-                path = draft_dir / name
-            else:
-                name = item_path.stem
-                path = item_path
-            self.__draft_items.append(Item(name, BlogType.Draft, path))
+            name = item_path.name if Config.mode == 'item' else item_path.stem
+            self.__draft_items.append(Item(name, BlogType.Draft, item_path))
         return self.__draft_items
 
     @property

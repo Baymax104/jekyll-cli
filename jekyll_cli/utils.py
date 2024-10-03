@@ -3,27 +3,22 @@ import ast
 from pathlib import Path
 from typing import Any, Tuple, Dict
 
-from ruamel.yaml import YAML
+import aiofiles
+import yaml
 
 
-def read_markdown(md_file: Path) -> Tuple[Dict[str, Any], str]:
-    with open(md_file, 'r', encoding='utf-8') as f:
-        content = f.read()
-    # split the content
+async def read_markdown(md_file: Path) -> Tuple[Dict[str, Any], str]:
+    async with aiofiles.open(md_file, 'r', encoding='utf-8') as f:
+        content = await f.read()
     parts = content.split('---\n', maxsplit=2)
-    yaml = YAML(pure=True)
-    yaml_formatter = yaml.load(parts[1])
+    meta = yaml.safe_load(parts[1]) if parts[1] else {}
     article = parts[2]
-    return yaml_formatter, article
+    return meta, article
 
 
-def write_markdown(md_file: Path, yaml_formatter: Dict[str, Any], article: str):
-    yaml = YAML(pure=True)
-    with open(md_file, 'w', encoding='utf-8') as f:
-        f.write('---\n')
-        yaml.dump(yaml_formatter, f)
-        f.write('---\n')
-        f.write(article)
+async def write_markdown(md_file: Path, meta: Dict[str, Any] = None, article: str = ''):
+    async with aiofiles.open(md_file, 'w', encoding='utf-8') as f:
+        await f.write(f'---\n{yaml.safe_dump(meta) if meta else ""}---\n{article}')
 
 
 def convert_literal(value: str) -> Any:

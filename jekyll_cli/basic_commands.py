@@ -12,7 +12,7 @@ from .prompt import *
 
 app = Typer(
     no_args_is_help=True,
-    help='[bold green]Jekyll Blog CLI Tool.',
+    help='Jekyll Blog CLI Tool.',
     rich_markup_mode='rich'
 )
 
@@ -152,7 +152,7 @@ def publish(pattern: Annotated[str, Argument(help='Pattern of draft name.')]):
 
     item = items[0] if len(items) == 1 else select_item_matches(items)
     item.publish()
-    print(f'[bold green]Draft [#ffb300]"{item.name}"[/] published as [#ffb300]"{item.file_path}"[/]')
+    print(f'[bold]Draft[/] {item.name} [bold]published as[/] {item.file_path}')
 
 
 @app.command(rich_help_panel='Operation')
@@ -168,7 +168,7 @@ def unpublish(pattern: Annotated[str, Argument(help='Pattern of post name.')]):
 
     item = items[0] if len(items) == 1 else select_item_matches(items)
     item.unpublish()
-    print(f'[bold green]Post [#ffb300]"{item.name}"[/] unpublished as [#ffb300]"{item.file_path}"[/]')
+    print(f'[bold]Post[/] "{item.name}" [bold]unpublished as[/] "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Configuration')
@@ -176,7 +176,6 @@ def init():
     """Initialize the application interactively."""
     print('[bold green]Welcome to the Jekyll CLI application!:wave::wave::wave:')
     print("Let's set up your basic configuration.:wink:")
-
     root = input_directory_path('Please enter the root path of your blog:')
     mode = select_mode()
 

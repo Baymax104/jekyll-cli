@@ -1,6 +1,6 @@
 # Jekyll CLI
 
-**Jekyll Blog CLI Tool.**
+Jekyll Blog CLI Tool.
 
 **Usage**:
 
@@ -18,6 +18,7 @@ $ blog [OPTIONS] COMMAND [ARGS]...
 * `config`: Configuration Subcommands.
 * `draft`: Create a draft.
 * `info`: Show info about post or draft.
+* `init`: Initialize the application interactively.
 * `list`: List all posts and drafts.
 * `open`: Open post or draft in editor.
 * `post`: Create a post.
@@ -128,6 +129,20 @@ $ blog info [OPTIONS] PATTERN
 **Arguments**:
 
 * `PATTERN`: Pattern of post or draft name.  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+## `blog init`
+
+Initialize the application interactively.
+
+**Usage**:
+
+```console
+$ blog init [OPTIONS]
+```
 
 **Options**:
 

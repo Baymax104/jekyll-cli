@@ -66,7 +66,8 @@ class __Config:
         return mode
 
     def get_formatter(self, type_: str) -> Dict[str, Any]:
-        return self.select(f'default-formatter.{type_.lower()}', default={})
+        formatter = self.select(f'default-formatter.{type_.lower()}', default={})
+        return OC.to_container(formatter, resolve=True)
 
     def select(self, key, **kwargs):
         return OC.select(self.__config, key, **kwargs)
