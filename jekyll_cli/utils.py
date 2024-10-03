@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-import os
+import ast
 from pathlib import Path
 from typing import Any, Tuple, Dict
 
@@ -8,22 +8,10 @@ from rich.console import Console
 from rich.progress import Progress as _Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 from ruamel.yaml import YAML
-from typer import Exit
 
 __console = Console()
 print = __console.print
 rule = __console.rule
-
-
-def check_root(root_dir: str) -> str:
-    if root_dir is None:
-        print('BLOG_ROOT environment variable is not set')
-        raise Exit(1)
-    elif not os.path.isdir(root_dir):
-        print('BLOG_ROOT environment variable is not a directory')
-        raise Exit(1)
-    else:
-        return root_dir
 
 
 def print_table(items):
@@ -42,7 +30,7 @@ def print_table(items):
 
 def print_info(item):
     table = Table(show_header=False)
-    table.add_column()
+    table.add_column(justify='right')
     table.add_column()
     table.add_row('[bold green]Name', f'[bold]{item.name}')
     table.add_row('[bold #ffb300]Type', f'[bold]{item.type.name}')
@@ -104,3 +92,27 @@ class Progress:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.progress.stop()
+
+
+def convert_literal(value: str) -> Any:
+    try:
+        value = ast.literal_eval(value)
+        return value
+    except Exception:
+        return value
+
+
+def check_configuration(key: str, value: Any):
+    match key:
+        case 'mode':
+            if not isinstance(value, str):
+                raise TypeError('value must be a string.')
+            if value not in ['single', 'item']:
+                raise ValueError('Unexpected value of mode, it can only be "single" or "item".')
+        case 'root':
+            if not isinstance(value, str):
+                raise TypeError('value must be a string.')
+            if not Path(value).is_dir():
+                raise ValueError('value must be a directory.')
+        case _:
+            pass

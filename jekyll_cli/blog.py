@@ -2,11 +2,11 @@
 from fnmatch import fnmatch
 from typing import List
 
-from .global_config import Config
+from .config import Config
 from .item import Item, BlogType
 
 
-class _Blog:
+class __Blog:
 
     def __init__(self):
         self.__post_items: List[Item] | None = None
@@ -93,4 +93,4 @@ class _Blog:
             self.drafts.remove(item)
 
 
-Blog = _Blog()
+Blog = __Blog()

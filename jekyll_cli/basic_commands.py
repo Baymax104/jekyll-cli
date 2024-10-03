@@ -1,11 +1,12 @@
 # -*- coding: UTF-8 -*-
+import os
 from typing import Annotated, List
 
 from typer import Typer, Option, Argument
 
 from .blog import Blog
+from .config import Config
 from .config_commands import app as config_app
-from .global_config import Config
 from .item import Item, BlogType
 from .utils import *
 
@@ -20,8 +21,8 @@ app.add_typer(config_app, rich_help_panel='Configuration')
 
 @app.command(rich_help_panel='Deployment')
 def serve(
-    draft: Annotated[bool, Option('--draft', '-d', help='Start blog server with drafts.')] = False,
-    port: Annotated[int, Option(help='Listen on the given port.')] = Config.port
+    draft: Annotated[bool, Option(help='Start blog server with drafts.')] = Config.select('deploy.draft'),
+    port: Annotated[int, Option(help='Listen on the given port.')] = Config.select('deploy.port')
 ):
     """Start blog server locally through jekyll."""
     os.chdir(Config.root)
@@ -29,12 +30,13 @@ def serve(
     # draft option
     if draft:
         command += ' --drafts'
-    command += f' --port {port}'
+    if port is not None:
+        command += f' --port {port}'
     os.system(command)
 
 
 @app.command(rich_help_panel='Deployment')
-def build(draft: Annotated[bool, Option('--draft', '-d', help='Build including drafts.')] = False):
+def build(draft: Annotated[bool, Option(help='Build including drafts.')] = Config.select('deploy.draft')):
     """Build jekyll site."""
     os.chdir(Config.root)
     command = 'bundle exec jekyll build'

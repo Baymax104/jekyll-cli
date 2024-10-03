@@ -8,7 +8,7 @@ from pathlib import Path
 
 from ruamel.yaml import YAML
 
-from .global_config import Config
+from .config import Config
 from .utils import read_markdown, write_markdown
 
 
