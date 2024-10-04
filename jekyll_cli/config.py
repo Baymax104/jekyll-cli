@@ -34,6 +34,8 @@ class __Config:
     def __init__(self):
         app_home = Path().home() / '.jekyll-cli'
         self.__config_path = app_home / 'config.yml'
+        self.__root: Path | None = None
+        self.__mode: str | None = None
 
         # create app home
         app_home.mkdir(exist_ok=True)
@@ -48,22 +50,30 @@ class __Config:
 
     @property
     def root(self) -> Path:
+        if self.__root is not None:
+            return self.__root
+
         root: str | None = OC.select(self.__config, 'root')
         if not root:
             raise ValueError('Key "root" is missing.')
         root: Path = Path(root)
         if not root.is_dir():
             raise ValueError('Key "root" is not a directory.')
-        return root
+        self.__root = root
+        return self.__root
 
     @property
     def mode(self) -> str:
+        if self.__mode is not None:
+            return self.__mode
+
         mode: str | None = OC.select(self.__config, 'mode')
         if not mode:
             raise ValueError('Key "mode" is missing.')
         elif mode not in ['single', 'item']:
             raise ValueError('Unexpected value of mode, it can only be "single" or "item".')
-        return mode
+        self.__mode = mode
+        return self.__mode
 
     def get_formatter(self, type_: str) -> Dict[str, Any]:
         formatter = self.select(f'default-formatter.{type_.lower()}', default={})

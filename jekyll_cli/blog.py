@@ -14,11 +14,11 @@ class __Blog:
 
     @property
     def posts(self) -> List[Item]:
-        return list(self.__post_items.values() if self.__post_items else self.__posts_dict.values())
+        return list(self.__posts_dict.values())
 
     @property
     def drafts(self) -> List[Item]:
-        return list(self.__draft_items.values() if self.__draft_items else self.__drafts_dict.values())
+        return list(self.__drafts_dict.values())
 
     @property
     def articles(self) -> List[Item]:
@@ -26,12 +26,14 @@ class __Blog:
 
     @property
     def __posts_dict(self) -> Dict[str, Item]:
-        self.__post_items = self.__initialize_items(BlogType.Post)
+        if not self.__post_items:
+            self.__post_items = self.__initialize_items(BlogType.Post)
         return self.__post_items
 
     @property
     def __drafts_dict(self) -> Dict[str, Item]:
-        self.__draft_items = self.__initialize_items(BlogType.Draft)
+        if not self.__draft_items:
+            self.__draft_items = self.__initialize_items(BlogType.Draft)
         return self.__draft_items
 
     def refresh(self):
@@ -43,7 +45,7 @@ class __Blog:
             case BlogType.Post:
                 items = self.__posts_dict
             case BlogType.Draft:
-                items = self.__posts_dict
+                items = self.__drafts_dict
             case _:
                 items = dict(self.__posts_dict, **self.__drafts_dict)
 
@@ -56,13 +58,13 @@ class __Blog:
         return [item for name, item in items.items() if fnmatch(name, f'*{pattern}*')]
 
     def add(self, item: Item):
-        items = self.__post_items if item.type == BlogType.Post else self.__draft_items
+        items = self.__posts_dict if item.type == BlogType.Post else self.__drafts_dict
         if item.name in items:
             raise KeyError(f'Exists duplicated key: {item.name}.')
         items[item.name] = item
 
     def remove(self, item: Item):
-        items = self.__post_items if item.type == BlogType.Post else self.__draft_items
+        items = self.__posts_dict if item.type == BlogType.Post else self.__drafts_dict
         if item.name not in items:
             raise KeyError(f'Key {item.name} is missing.')
         del items[item.name]
