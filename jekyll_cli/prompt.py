@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from pathlib import Path
+from typing import List, Any, Dict
 
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
@@ -13,10 +14,9 @@ print = __console.print
 rule = __console.rule
 
 
-def print_table(items):
-    if len(items) == 0:
+def print_table(items: List[Any]):
+    if not items:
         return
-
     table = Table(show_header=False)
     table.add_column()
     table.add_column()
@@ -27,14 +27,12 @@ def print_table(items):
     print(table)
 
 
-def print_info(item):
+def print_info(info: Dict[str, Any]):
     table = Table(show_header=False)
-    table.add_column(justify='right')
     table.add_column()
-    table.add_row('[bold green]Name', f'[bold]{item.name}')
-    table.add_row('[bold #ffb300]Type', f'[bold]{item.type.name}')
-    table.add_row('[bold #006eff]Item path', f'[bold]{item.path}')
-    table.add_row('[bold #006eff]Markdown file path', f'[bold]{item.file_path}')
+    table.add_column()
+    for key, value in info.items():
+        table.add_row(f'[bold green]{key.capitalize()}', f'[bold]{value}')
     print(table)
 
 

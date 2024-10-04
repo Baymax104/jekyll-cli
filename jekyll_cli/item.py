@@ -6,6 +6,7 @@ import shutil
 import time
 from enum import Enum
 from pathlib import Path
+from typing import Dict, Any
 
 from .config import Config
 from .utils import read_markdown, write_markdown
@@ -49,7 +50,7 @@ class Item:
             return None
 
         # find .md file for item mode
-        pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.__type == BlogType.Post else rf'^{self.name}.md$'
+        pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.type == BlogType.Post else rf'^{self.name}.md$'
         matched = [f for f in self.path.iterdir() if re.match(pattern, f.name) and f.is_file()]
         self.__file_path = matched[0] if len(matched) > 0 else None
         return self.__file_path
@@ -69,7 +70,7 @@ class Item:
         item_path: Path | None = None
         for path in self.__parent_dir.iterdir():
             if Config.mode == 'single':
-                pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.__type == BlogType.Post else rf'^{self.name}.md$'
+                pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.type == BlogType.Post else rf'^{self.name}.md$'
                 is_type_valid = path.is_file()
             else:
                 pattern = rf'^{self.name}$'
@@ -90,14 +91,14 @@ class Item:
 
         # .md file processing
         filename = self.name + '.md'
-        if self.__type == BlogType.Post:
+        if self.type == BlogType.Post:
             filename = f'{time.strftime("%Y-%m-%d")}-{filename}'
 
         file_path = self.__parent_dir / filename if Config.mode == 'single' else self.__parent_dir / self.name / filename
         formatter = Config.get_formatter(self.__type.name)
 
         # fill current time
-        if self.__type == BlogType.Post and not formatter['date']:
+        if self.type == BlogType.Post and not formatter['date']:
             formatter['date'] = time.strftime("%Y-%m-%d %H:%M")
         # fill formatter
         if title is not None:
@@ -122,7 +123,7 @@ class Item:
             shutil.rmtree(self.path)
 
     def publish(self):
-        if self.__type != BlogType.Draft:
+        if self.type != BlogType.Draft:
             return
 
         if self.path is None or self.file_path is None:
@@ -146,16 +147,13 @@ class Item:
         self.__file_path = dest_file_path
 
         # update .md file
-        async def update_file():
-            formatter, article = await read_markdown(dest_file_path)
-            formatter['date'] = time.strftime("%Y-%m-%d %H:%M")
-            await write_markdown(dest_file_path, formatter, article)
-
-        asyncio.run(update_file())
+        formatter, article = read_markdown(dest_file_path)
+        formatter['date'] = time.strftime("%Y-%m-%d %H:%M")
+        write_markdown(dest_file_path, formatter, article)
         self.__type = BlogType.Post
 
     def unpublish(self):
-        if self.__type != BlogType.Post:
+        if self.type != BlogType.Post:
             return
 
         if self.path is None or self.file_path is None:
@@ -179,14 +177,22 @@ class Item:
         self.__file_path = dest_file_path
 
         # update .md file
-        async def update_file():
-            formatter, article = await read_markdown(dest_file_path)
-            if 'date' in formatter:
-                del formatter['date']
-            await write_markdown(dest_file_path, formatter, article)
-
-        asyncio.run(update_file())
+        formatter, article = read_markdown(dest_file_path)
+        if 'date' in formatter:
+            del formatter['date']
+        write_markdown(dest_file_path, formatter, article)
         self.__type = BlogType.Draft
+
+    def info(self) -> Dict[str, Any]:
+        formatter, _ = read_markdown(self.file_path)
+        infos = {
+            'name': self.name,
+            'type': self.type.name,
+            'item-path': self.path,
+            'file-path': self.file_path,
+        }
+        infos = dict(infos, **formatter)
+        return infos
 
     def __str__(self):
         return self.name

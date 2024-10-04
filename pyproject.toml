@@ -14,7 +14,6 @@ python = "^3.10"
 typer = "^0.12.5"
 inquirerpy = "^0.3.4"
 omegaconf = "^2.3.0"
-aiofiles = "^24.1.0"
 
 [tool.poe.poetry_hooks]
 pre_build = "generate_document"

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 import os
-from typing import Annotated, List
+from typing import Annotated
 
 from typer import Typer, Option, Argument
 
@@ -55,7 +55,7 @@ def info(name: Annotated[str, Argument(help='Name of post or draft.')]):
 
     item = items[0] if len(items) == 1 else select_item_matches(items)
     rule('[bold green]Info')
-    print_info(item)
+    print_info(item.info())
 
 
 @app.command(name='list', rich_help_panel='Operation')
@@ -152,7 +152,7 @@ def publish(name: Annotated[str, Argument(help='Name of draft.')]):
 
     item = items[0] if len(items) == 1 else select_item_matches(items)
     item.publish()
-    print(f'[bold]Draft[/] {item.name} [bold]published as[/] {item.file_path}')
+    print(f'Draft "{item.name}" published as "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Operation')
@@ -168,7 +168,7 @@ def unpublish(name: Annotated[str, Argument(help='Name of post.')]):
 
     item = items[0] if len(items) == 1 else select_item_matches(items)
     item.unpublish()
-    print(f'[bold]Post[/] "{item.name}" [bold]unpublished as[/] "{item.file_path}"')
+    print(f'Post "{item.name}" unpublished as "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Configuration')
@@ -181,8 +181,8 @@ def init():
 
     rule()
     print('You have entered the following configurations:')
-    print(f'[green]Blog root path[/]: {root}')
-    print(f'[green]Management mode[/]: {mode}')
+    print_info({'Blog root path': str(root), 'Management mode': mode})
+
     if confirm('Confirm your basic configurations?', default=True):
         Config.merge({'root': str(root), 'mode': mode})
         print('[bold green]Basic configuration set up successfully!')
