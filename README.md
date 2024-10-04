@@ -123,12 +123,12 @@ Show info about post or draft.
 **Usage**:
 
 ```console
-$ blog info [OPTIONS] PATTERN
+$ blog info [OPTIONS] NAME
 ```
 
 **Arguments**:
 
-* `PATTERN`: Pattern of post or draft name.  [required]
+* `NAME`: Name of post or draft.  [required]
 
 **Options**:
 
@@ -171,12 +171,12 @@ Open post or draft in editor.
 **Usage**:
 
 ```console
-$ blog open [OPTIONS] PATTERN
+$ blog open [OPTIONS] NAME
 ```
 
 **Arguments**:
 
-* `PATTERN`: Pattern of post or draft name.  [required]
+* `NAME`: Name of post or draft.  [required]
 
 **Options**:
 
@@ -211,12 +211,12 @@ Publish a draft.
 **Usage**:
 
 ```console
-$ blog publish [OPTIONS] PATTERN
+$ blog publish [OPTIONS] NAME
 ```
 
 **Arguments**:
 
-* `PATTERN`: Pattern of draft name.  [required]
+* `NAME`: Name of draft.  [required]
 
 **Options**:
 
@@ -229,12 +229,12 @@ Remove a post or draft.
 **Usage**:
 
 ```console
-$ blog remove [OPTIONS] PATTERN
+$ blog remove [OPTIONS] NAME
 ```
 
 **Arguments**:
 
-* `PATTERN`: Pattern of post or draft name.  [required]
+* `NAME`: Name of post or draft.  [required]
 
 **Options**:
 
@@ -263,12 +263,12 @@ Unpublish a post.
 **Usage**:
 
 ```console
-$ blog unpublish [OPTIONS] PATTERN
+$ blog unpublish [OPTIONS] NAME
 ```
 
 **Arguments**:
 
-* `PATTERN`: Pattern of post name.  [required]
+* `NAME`: Name of post.  [required]
 
 **Options**:
 
