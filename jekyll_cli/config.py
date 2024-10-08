@@ -99,4 +99,4 @@ class __Config:
         return OC.to_yaml(self.__config)
 
 
-Config = __Config()
+Config: __Config = __Config()

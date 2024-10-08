@@ -4,7 +4,6 @@ from typing import Annotated, Any
 from rich import print_json
 from typer import Typer, Argument
 
-from .blog import Blog
 from .config import Config
 from .prompt import print
 from .utils import convert_literal, check_configuration
@@ -31,5 +30,4 @@ def set_config(
     """Set a configuration."""
     check_configuration(key, value)
     Config.update(key, value)
-    Blog.refresh()
     print(f'[bold green]Configuration modified successfully.')

@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
-import asyncio
-import os.path
+import os
 import re
 import shutil
 import time
@@ -50,7 +49,7 @@ class Item:
             return None
 
         # find .md file for item mode
-        pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.type == BlogType.Post else rf'^{self.name}.md$'
+        pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}\.md$' if self.type == BlogType.Post else rf'^{self.name}\.md$'
         matched = [f for f in self.path.iterdir() if re.match(pattern, f.name) and f.is_file()]
         self.__file_path = matched[0] if len(matched) > 0 else None
         return self.__file_path
@@ -107,8 +106,7 @@ class Item:
             formatter['categories'] = class_
         if tag is not None:
             formatter['tags'] = tag
-
-        asyncio.run(write_markdown(file_path, formatter))
+        write_markdown(file_path, formatter)
 
     def open(self):
         if self.file_path:

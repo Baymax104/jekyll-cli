@@ -3,21 +3,24 @@ import ast
 from pathlib import Path
 from typing import Any, Tuple, Dict
 
-import yaml
+from ruamel.yaml import YAML
 
 
 def read_markdown(md_file: Path) -> Tuple[Dict[str, Any], str]:
     with open(md_file, 'r', encoding='utf-8') as f:
         content = f.read()
     parts = content.split('---\n', maxsplit=2)
-    formatter = yaml.safe_load(parts[1]) if parts[1] else {}
+    formatter = YAML().load(parts[1]) if parts[1] else {}
     article = parts[2]
     return formatter, article
 
 
 def write_markdown(md_file: Path, formatter: Dict[str, Any] = None, article: str = ''):
     with open(md_file, 'w', encoding='utf-8') as f:
-        f.write(f'---\n{yaml.safe_dump(formatter) if formatter else ""}---\n{article}')
+        f.write('---\n')
+        if formatter:
+            YAML().dump(formatter, f)
+        f.write(f'---\n{article}')
 
 
 def convert_literal(value: str) -> Any:

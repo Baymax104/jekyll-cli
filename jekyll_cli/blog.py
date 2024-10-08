@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import re
 from fnmatch import fnmatch
 from typing import List, Dict
 
@@ -36,10 +37,6 @@ class __Blog:
             self.__draft_items = self.__initialize_items(BlogType.Draft)
         return self.__draft_items
 
-    def refresh(self):
-        self.__post_items = None
-        self.__draft_items = None
-
     def find(self, pattern: str, subset: BlogType | None = None) -> List[Item]:
         match subset:
             case BlogType.Post:
@@ -57,18 +54,6 @@ class __Blog:
         # fuzzy match
         return [item for name, item in items.items() if fnmatch(name, f'*{pattern}*')]
 
-    def add(self, item: Item):
-        items = self.__posts_dict if item.type == BlogType.Post else self.__drafts_dict
-        if item.name in items:
-            raise KeyError(f'Exists duplicated key: {item.name}.')
-        items[item.name] = item
-
-    def remove(self, item: Item):
-        items = self.__posts_dict if item.type == BlogType.Post else self.__drafts_dict
-        if item.name not in items:
-            raise KeyError(f'Key {item.name} is missing.')
-        del items[item.name]
-
     def __initialize_items(self, type_: BlogType) -> Dict[str, Item]:
         parent_dir = Config.root / type_.value
         if not parent_dir.is_dir():
@@ -81,11 +66,16 @@ class __Blog:
 
         items = {}
         for item_path in item_paths:
-            name = item_path.name if Config.mode == 'item' else item_path.stem
-            if name in items:
-                raise KeyError(f'Exists duplicated key: {name}.')
+            if Config.mode == 'item':
+                name = item_path.name
+            else:
+                pattern = r'\d{4}-\d{2}-\d{2}-(.+)\.md' if type_ == BlogType.Post else r'(.+)\.md'
+                name = re.search(pattern, item_path.name).group(1)
             items[name] = Item(name, type_, item_path)
         return items
 
+    def __contains__(self, item: Item) -> bool:
+        return item.name in (self.__posts_dict if item.type == BlogType.Post else self.__drafts_dict)
 
-Blog = __Blog()
+
+Blog: __Blog = __Blog()

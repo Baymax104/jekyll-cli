@@ -96,8 +96,10 @@ def draft(
 ):
     """Create a draft."""
     item = Item(name, BlogType.Draft)
+    if item in Blog:
+        print(f'[bold red]Draft "{item.name}" already exists.')
+        return
     item.create(title, class_, tag)
-    Blog.add(item)
     print(f'[bold]{item.file_path} [green]created as draft successfully.')
     if open_:
         with Progress('Opening draft...'):
@@ -114,8 +116,10 @@ def post(
 ):
     """Create a post."""
     item = Item(name, BlogType.Post)
+    if item in Blog:
+        print(f'[bold red]Post "{item.name}" already exists.')
+        return
     item.create(title, class_, tag)
-    Blog.add(item)
     print(f'[bold]{item.file_path} [green]created as post successfully.')
     if open_:
         with Progress('Opening post...'):
@@ -135,7 +139,6 @@ def remove(name: Annotated[str, Argument(help='Name of post or draft.')]):
     if confirm(f'Found {len(items)} matches, remove above items?'):
         for item in items:
             item.remove()
-            Blog.remove(item)
         print('[bold green]Remove successfully.')
 
 
