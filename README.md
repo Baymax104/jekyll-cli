@@ -19,7 +19,7 @@ $ blog [OPTIONS] COMMAND [ARGS]...
 * `draft`: Create a draft.
 * `info`: Show info about post or draft.
 * `init`: Initialize the application interactively.
-* `list`: List all posts and drafts.
+* `list`: List all posts and drafts or find items by...
 * `open`: Open post or draft in editor.
 * `post`: Create a post.
 * `publish`: Publish a draft.
@@ -150,13 +150,17 @@ $ blog init [OPTIONS]
 
 ## `blog list`
 
-List all posts and drafts.
+List all posts and drafts or find items by name.
 
 **Usage**:
 
 ```console
-$ blog list [OPTIONS]
+$ blog list [OPTIONS] [NAME]
 ```
+
+**Arguments**:
+
+* `[NAME]`: Name of post or draft.
 
 **Options**:
 
