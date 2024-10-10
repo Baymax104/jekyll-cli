@@ -61,17 +61,27 @@ def info(name: Annotated[str, Argument(help='Name of post or draft.', autocomple
 
 @app.command(name='list', rich_help_panel='Operation')
 def list_items(
+    name: Annotated[str, Argument(help='Name of post or draft.', autocompletion=complete_items(Blog.articles))] = None,
     draft: Annotated[bool, Option('--draft', '-d', help='List only all drafts.')] = False,
     post: Annotated[bool, Option('--post', '-p', help='List only all posts.')] = False,
 ):
-    """List all posts and drafts."""
-    if post or (not post and not draft):
-        rule('[bold green]Posts')
-        print_table(Blog.posts)
-
-    if draft or (not post and not draft):
-        rule('[bold green]Drafts')
-        print_table(Blog.drafts)
+    """List all posts and drafts or find items by name."""
+    match (draft, post):
+        case (True, False):
+            drafts, posts = (Blog.find(name, BlogType.Draft) if name is not None else Blog.drafts, None)
+        case (False, True):
+            drafts, posts = (None, Blog.find(name, BlogType.Post) if name is not None else Blog.posts)
+        case _:
+            if name is not None:
+                items = Blog.find(name)
+                drafts = [item for item in items if item.type == BlogType.Draft]
+                posts = [item for item in items if item.type == BlogType.Post]
+            else:
+                drafts, posts = (Blog.drafts, Blog.posts)
+    if posts is not None:
+        print_table(posts, title='[bold green]Posts', show_header=False)
+    if drafts is not None:
+        print_table(drafts, title='[bold green]Drafts', show_header=False)
 
 
 @app.command(name='open', rich_help_panel='Operation')
