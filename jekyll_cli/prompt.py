@@ -14,10 +14,10 @@ print = __console.print
 rule = __console.rule
 
 
-def print_table(items: List[Any]):
+def print_table(items: List[Any], **table_config):
     if not items:
         return
-    table = Table(show_header=False)
+    table = Table(**table_config)
     table.add_column()
     table.add_column()
     for i in range(0, len(items), 2):
@@ -49,23 +49,26 @@ class Progress:
         self.progress.stop()
 
 
+def select(message, choices: List[Any] | Dict[str, Any]) -> Any:
+    match choices:
+        case list():
+            select_choices = choices
+        case dict():
+            select_choices = [Choice(name=name, value=value) for name, value in choices.items()]
+        case _:
+            raise ValueError('choices is not a list or dict.')
+    return inquirer.select(
+        message=message,
+        choices=select_choices,
+        vi_mode=True
+    ).execute()
+
+
 def select_item_matches(items):
-    return inquirer.select(
+    return select(
         message=f'Found {len(items)} matches, select one to continue:',
-        choices=[Choice(value=item, name=f'[{item.type.name}] {item.name}') for item in items],
-        vi_mode=True
-    ).execute()
-
-
-def select_mode() -> str:
-    return inquirer.select(
-        message='Please choose the management mode (single or item):',
-        choices=[
-            Choice('single', 'single (A single markdown file denotes a blog item.)'),
-            Choice('item', 'item (A directory containing a markdown file and an assets directory denotes a blog item.)')
-        ],
-        vi_mode=True
-    ).execute()
+        choices={f'[{item.type.name}] {item.name}': item for item in items}
+    )
 
 
 def confirm(message, default=False) -> bool:

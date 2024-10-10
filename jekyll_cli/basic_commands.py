@@ -151,8 +151,7 @@ def publish(name: Annotated[str, Argument(help='Name of draft.', autocompletion=
     items = Blog.find(name, BlogType.Draft)
 
     if len(items) == 0:
-        rule('[bold green]Drafts')
-        print_table(Blog.drafts)
+        print_table(Blog.drafts, title='[bold green]Drafts', show_header=False)
         print('[bold red]No such item in _drafts.')
         return
 
@@ -167,8 +166,7 @@ def unpublish(name: Annotated[str, Argument(help='Name of post.', autocompletion
     items = Blog.find(name, BlogType.Post)
 
     if len(items) == 0:
-        rule('[bold green]Posts')
-        print_table(Blog.posts)
+        print_table(Blog.posts, title='[bold green]Posts', show_header=False)
         print('[bold red]No such item in _posts.')
         return
 
@@ -183,7 +181,13 @@ def init():
     print('[bold green]Welcome to the Jekyll CLI application!:wave::wave::wave:')
     print("Let's set up your basic configuration.:wink:")
     root = input_directory_path('Please enter the root path of your blog:')
-    mode = select_mode()
+    mode = select(
+        message='Please choose the management mode (single or item):',
+        choices={
+            'single (A single markdown file denotes a blog item.)': 'single',
+            'item (A directory containing a markdown file and an assets directory denotes a blog item.)': 'item'
+        }
+    )
 
     rule()
     print('You have entered the following configurations:')
