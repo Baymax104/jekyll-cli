@@ -9,6 +9,7 @@ from .config import Config
 from .config_commands import app as config_app
 from .item import Item, BlogType
 from .prompt import *
+from .utils import complete_items
 
 app = Typer(
     no_args_is_help=True,
@@ -46,7 +47,7 @@ def build(draft: Annotated[bool, Option(help='Build including drafts.')] = Confi
 
 
 @app.command(rich_help_panel='Operation')
-def info(name: Annotated[str, Argument(help='Name of post or draft.')]):
+def info(name: Annotated[str, Argument(help='Name of post or draft.', autocompletion=complete_items(Blog.articles))]):
     """Show info about post or draft."""
     items = Blog.find(name)
     if len(items) == 0:
@@ -74,7 +75,9 @@ def list_items(
 
 
 @app.command(name='open', rich_help_panel='Operation')
-def open_item(name: Annotated[str, Argument(help='Name of post or draft.')]):
+def open_item(
+    name: Annotated[str, Argument(help='Name of post or draft.', autocompletion=complete_items(Blog.articles))]
+):
     """Open post or draft in editor."""
     items = Blog.find(name)
     if len(items) == 0:
@@ -127,7 +130,7 @@ def post(
 
 
 @app.command(rich_help_panel='Operation')
-def remove(name: Annotated[str, Argument(help='Name of post or draft.')]):
+def remove(name: Annotated[str, Argument(help='Name of post or draft.', autocompletion=complete_items(Blog.articles))]):
     """Remove a post or draft."""
     items = Blog.find(name)
     if len(items) == 0:
@@ -143,7 +146,7 @@ def remove(name: Annotated[str, Argument(help='Name of post or draft.')]):
 
 
 @app.command(rich_help_panel='Operation')
-def publish(name: Annotated[str, Argument(help='Name of draft.')]):
+def publish(name: Annotated[str, Argument(help='Name of draft.', autocompletion=complete_items(Blog.drafts))]):
     """Publish a draft."""
     items = Blog.find(name, BlogType.Draft)
 
@@ -159,7 +162,7 @@ def publish(name: Annotated[str, Argument(help='Name of draft.')]):
 
 
 @app.command(rich_help_panel='Operation')
-def unpublish(name: Annotated[str, Argument(help='Name of post.')]):
+def unpublish(name: Annotated[str, Argument(help='Name of post.', autocompletion=complete_items(Blog.posts))]):
     """Unpublish a post."""
     items = Blog.find(name, BlogType.Post)
 

@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 import ast
 from pathlib import Path
-from typing import Any, Tuple, Dict
+from typing import Any, Tuple, Dict, List, Callable
 
 from ruamel.yaml import YAML
 
@@ -45,3 +45,10 @@ def check_configuration(key: str, value: Any):
                 raise ValueError('value must be a directory.')
         case _:
             pass
+
+
+def complete_items(candidates: List[Any]) -> Callable[[str], List[str]]:
+    def complete(incomplete: str) -> List[str]:
+        return [str(candidate) for candidate in candidates if str(candidate).startswith(incomplete)]
+
+    return complete
