@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import ast
+import re
 from pathlib import Path
 from typing import Any, Tuple, Dict, List, Callable
 
@@ -52,3 +53,12 @@ def complete_items(candidates: List[Any]) -> Callable[[str], List[str]]:
         return [str(candidate) for candidate in candidates if str(candidate).startswith(incomplete)]
 
     return complete
+
+
+def path_filter(mode: str, path: Path):
+    return (path.is_file() and path.suffix == '.md') if mode == 'single' else path.is_dir()
+
+
+def extract_item_name(type_, filename):
+    pattern = r'\d{4}-\d{2}-\d{2}-(.+)\.md' if type_ == 'Post' else r'(.+)\.md'
+    return re.search(pattern, filename).group(1)

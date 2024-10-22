@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
-import re
 from fnmatch import fnmatch
 from typing import List, Dict
 
 from .config import Config
 from .item import Item, BlogType
+from .utils import path_filter, extract_item_name
 
 
 class __Blog:
@@ -46,12 +46,12 @@ class __Blog:
             case _:
                 items = dict(self.__posts_dict, **self.__drafts_dict)
 
-        # precise match
+        # precise matching
         item = items.get(pattern)
         if item is not None:
             return [item]
 
-        # fuzzy match
+        # fuzzy matching
         return [item for name, item in items.items() if fnmatch(name, f'*{pattern}*')]
 
     def __initialize_items(self, type_: BlogType) -> Dict[str, Item]:
@@ -59,18 +59,9 @@ class __Blog:
         if not parent_dir.is_dir():
             raise ValueError(f'{parent_dir} is not a directory.')
 
-        if Config.mode == 'item':
-            item_paths = [f for f in parent_dir.iterdir() if f.is_dir()]
-        else:
-            item_paths = [f for f in parent_dir.iterdir() if f.is_file() and f.suffix == '.md']
-
         items = {}
-        for item_path in item_paths:
-            if Config.mode == 'item':
-                name = item_path.name
-            else:
-                pattern = r'\d{4}-\d{2}-\d{2}-(.+)\.md' if type_ == BlogType.Post else r'(.+)\.md'
-                name = re.search(pattern, item_path.name).group(1)
+        for item_path in [f for f in parent_dir.iterdir() if path_filter(Config.mode, f)]:
+            name = extract_item_name(type_.name, item_path.name) if Config.mode == 'single' else item_path.name
             items[name] = Item(name, type_, item_path)
         return items
 

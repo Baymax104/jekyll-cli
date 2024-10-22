@@ -5,7 +5,7 @@ import shutil
 import time
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Literal
 
 from .config import Config
 from .utils import read_markdown, write_markdown
@@ -127,17 +127,7 @@ class Item:
         if self.path is None or self.file_path is None:
             raise ValueError('Item path or file path is null.')
 
-        src_parent_dir = self.__parent_dir
-        src_path = self.path
-        src_file_path = self.file_path
-        dest_parent_dir = Config.root / '_posts'
-        dest_path = dest_parent_dir / src_path.relative_to(src_parent_dir)
-        dest_file_path = dest_parent_dir / src_file_path.relative_to(src_parent_dir)
-
-        # move item
-        shutil.move(src_path, dest_path)
-        self.__parent_dir = dest_parent_dir
-        self.__path = dest_path
+        dest_file_path = self.__move_item('_posts')
 
         # rename .md file
         post_filename = f'{time.strftime("%Y-%m-%d")}-{dest_file_path.name}'
@@ -157,17 +147,7 @@ class Item:
         if self.path is None or self.file_path is None:
             raise ValueError('Item path or file path is null.')
 
-        src_parent_dir = self.__parent_dir
-        src_path = self.path
-        src_file_path = self.file_path
-        dest_parent_dir = Config.root / '_drafts'
-        dest_path = dest_parent_dir / src_path.relative_to(src_parent_dir)
-        dest_file_path = dest_parent_dir / src_file_path.relative_to(src_parent_dir)
-
-        # move item
-        shutil.move(src_path, dest_path)
-        self.__parent_dir = dest_parent_dir
-        self.__path = dest_path
+        dest_file_path = self.__move_item('_drafts')
 
         # rename .md file
         draft_filename = dest_file_path.name.split('-', 3)[3]
@@ -191,6 +171,18 @@ class Item:
         }
         infos = dict(infos, **formatter)
         return infos
+
+    def __move_item(self, dest: Literal['_posts', '_drafts']):
+        src_parent_dir = self.__parent_dir
+        src_path = self.path
+        src_file_path = self.file_path
+        dest_parent_dir = Config.root / dest
+        dest_path = dest_parent_dir / src_path.relative_to(src_parent_dir)
+        dest_file_path = dest_parent_dir / src_file_path.relative_to(src_parent_dir)
+        shutil.move(src_path, dest_path)
+        self.__parent_dir = dest_parent_dir
+        self.__path = dest_path
+        return dest_file_path
 
     def __str__(self):
         return self.name
