@@ -84,6 +84,10 @@ class __Config:
 
     def update(self, key, value):
         OC.update(self.__config, key, value, merge=False)
+        if key == 'root':
+            self.__root = value
+        elif key == 'mode':
+            self.__mode = value
         OC.save(self.__config, self.__config_path)
 
     def merge(self, config: Dict):

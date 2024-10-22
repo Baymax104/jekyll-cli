@@ -194,3 +194,11 @@ class Item:
 
     def __str__(self):
         return self.name
+
+    def __iter__(self):
+        yield from {
+            'name': self.name,
+            'type': self.type.name,
+            'item-path': str(self.path),
+            'file-path': str(self.file_path)
+        }.items()
