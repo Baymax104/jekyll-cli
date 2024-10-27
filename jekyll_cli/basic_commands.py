@@ -26,7 +26,8 @@ def serve(
     port: Annotated[int, Option(help='Listen on the given port.')] = Config.select('deploy.port')
 ):
     """Start blog server locally through jekyll."""
-    os.chdir(Config.root)
+    if Config.root is not None:
+        os.chdir(Config.root)
     command = 'bundle exec jekyll serve'
     # draft option
     if draft:
@@ -39,7 +40,8 @@ def serve(
 @app.command(rich_help_panel='Deployment')
 def build(draft: Annotated[bool, Option(help='Build including drafts.')] = Config.select('deploy.draft')):
     """Build jekyll site."""
-    os.chdir(Config.root)
+    if Config.root is not None:
+        os.chdir(Config.root)
     command = 'bundle exec jekyll build'
     if draft:
         command += ' --drafts'

@@ -49,13 +49,13 @@ class __Config:
             self.__config = OC.load(self.__config_path)
 
     @property
-    def root(self) -> Path:
+    def root(self) -> Path | None:
         if self.__root is not None:
             return self.__root
 
         root: str | None = OC.select(self.__config, 'root')
         if not root:
-            raise ValueError('Key "root" is missing.')
+            return None
         root: Path = Path(root)
         if not root.is_dir():
             raise ValueError('Key "root" is not a directory.')

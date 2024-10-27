@@ -176,7 +176,7 @@ class Item:
         src_parent_dir = self.__parent_dir
         src_path = self.path
         src_file_path = self.file_path
-        dest_parent_dir = Config.root / dest
+        dest_parent_dir = self.__parent_dir.parent / dest
         dest_path = dest_parent_dir / src_path.relative_to(src_parent_dir)
         dest_file_path = dest_parent_dir / src_file_path.relative_to(src_parent_dir)
         shutil.move(src_path, dest_path)

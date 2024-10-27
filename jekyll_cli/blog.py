@@ -55,6 +55,8 @@ class __Blog:
         return [item for name, item in items.items() if fnmatch(name, f'*{pattern}*')]
 
     def __initialize_items(self, type_: BlogType) -> Dict[str, Item]:
+        if Config.root is None:
+            return {}
         parent_dir = Config.root / type_.value
         if not parent_dir.is_dir():
             raise ValueError(f'{parent_dir} is not a directory.')
