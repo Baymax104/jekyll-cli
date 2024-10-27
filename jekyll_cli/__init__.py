@@ -3,4 +3,4 @@ from .basic_commands import app
 
 # Typer App for executing 'typer powerjekyll run'
 __all__ = [app]
-__version__ = '1.0.5'
+__version__ = '1.0.6'
