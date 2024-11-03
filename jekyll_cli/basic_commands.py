@@ -56,7 +56,10 @@ def info(name: Annotated[str, Argument(help='Name of post or draft.', autocomple
         print('[bold red]No such item.')
         return
 
-    item = items[0] if len(items) == 1 else select_item_matches(items)
+    item = items[0] if len(items) == 1 else select(
+        message=f'Found {len(items)} matches, select one to check:',
+        choices={f'[{item.type.name}] {item.name}': item for item in items}
+    )
     rule('[bold green]Info')
     print_info(item.info())
 
@@ -96,7 +99,10 @@ def open_item(
         print(f'[bold red]No such item.')
         return
 
-    item = items[0] if len(items) == 1 else select_item_matches(items)
+    item = items[0] if len(items) == 1 else select(
+        message=f'Found {len(items)} matches, select one to open:',
+        choices={f'[{item.type.name}] {item.name}': item for item in items}
+    )
     with Progress(f'Opening {item.file_path}'):
         item.open()
 
@@ -149,7 +155,11 @@ def remove(name: Annotated[str, Argument(help='Name of post or draft.', autocomp
         print(f'[bold red]No such item.')
         return
 
-    for i, item in enumerate(items):
+    selected_items = items[0] if len(items) == 1 else check(
+        message=f'Found {len(items)} matches, select items to remove (Ctrl+A to select all, Ctrl+R to toggle selection):',
+        choices={f'[{item.type.name}] {item.name}': item for item in items}
+    )
+    for i, item in enumerate(selected_items):
         print(f'{i + 1}. {item}')
     if confirm(f'Found {len(items)} matches, remove above items?'):
         for item in items:
@@ -167,9 +177,14 @@ def publish(name: Annotated[str, Argument(help='Name of draft.', autocompletion=
         print('[bold red]No such item in _drafts.')
         return
 
-    item = items[0] if len(items) == 1 else select_item_matches(items)
-    item.publish()
-    print(f'Draft "{item.name}" published as "{item.file_path}"')
+    if len(items) != 1:
+        items = check(
+            message=f'Found {len(items)} matches, select items to publish (Ctrl+A to select all, Ctrl+R to toggle selection):',
+            choices={f'[{item.type.name}] {item.name}': item for item in items}
+        )
+    for item in items:
+        item.publish()
+        print(f'Draft "{item.name}" published as "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Operation')
@@ -182,9 +197,14 @@ def unpublish(name: Annotated[str, Argument(help='Name of post.', autocompletion
         print('[bold red]No such item in _posts.')
         return
 
-    item = items[0] if len(items) == 1 else select_item_matches(items)
-    item.unpublish()
-    print(f'Post "{item.name}" unpublished as "{item.file_path}"')
+    if len(items) != 1:
+        items = check(
+            message=f'Found {len(items)} matches, select items to unpublish (Ctrl+A to select all, Ctrl+R to toggle selection):',
+            choices={f'[{item.type.name}] {item.name}': item for item in items}
+        )
+    for item in items:
+        item.unpublish()
+        print(f'Post "{item.name}" unpublished as "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Configuration')

@@ -64,11 +64,19 @@ def select(message, choices: List[Any] | Dict[str, Any]) -> Any:
     ).execute()
 
 
-def select_item_matches(items):
-    return select(
-        message=f'Found {len(items)} matches, select one to continue:',
-        choices={f'[{item.type.name}] {item.name}': item for item in items}
-    )
+def check(message, choices: List[Any] | Dict[str, Any]) -> Any:
+    match choices:
+        case list():
+            select_choices = choices
+        case dict():
+            select_choices = [Choice(name=name, value=value) for name, value in choices.items()]
+        case _:
+            raise ValueError('choices is not a list or dict.')
+    return inquirer.checkbox(
+        message=message,
+        choices=select_choices,
+        vi_mode=True
+    ).execute()
 
 
 def confirm(message, default=False) -> bool:
