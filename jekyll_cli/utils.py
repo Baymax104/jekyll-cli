@@ -55,10 +55,13 @@ def complete_items(candidates: List[Any]) -> Callable[[str], List[str]]:
     return complete
 
 
-def path_filter(mode: str, path: Path):
+def path_filter(mode: str, path: Path) -> bool:
     return (path.is_file() and path.suffix == '.md') if mode == 'single' else path.is_dir()
 
 
-def extract_item_name(type_, filename):
-    pattern = r'\d{4}-\d{2}-\d{2}-(.+)\.md' if type_ == 'Post' else r'(.+)\.md'
-    return re.search(pattern, filename).group(1)
+def split_filename(filename: str) -> Tuple[str, str]:
+    if not re.match(r'\d{4}-\d{2}-\d{2}-(.+)', filename):
+        return filename, filename
+
+    parts = filename.split('-', 3)
+    return '-'.join(parts[0:3]), parts[3]

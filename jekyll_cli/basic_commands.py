@@ -73,9 +73,11 @@ def list_items(
     """List all posts and drafts or find items by name."""
     match (draft, post):
         case (True, False):
-            drafts, posts = (Blog.find(name, BlogType.Draft) if name is not None else Blog.drafts, None)
+            drafts = Blog.find(name, BlogType.Draft) if name is not None else Blog.drafts
+            posts = None
         case (False, True):
-            drafts, posts = (None, Blog.find(name, BlogType.Post) if name is not None else Blog.posts)
+            drafts = None
+            posts = Blog.find(name, BlogType.Post) if name is not None else Blog.posts
         case _:
             if name is not None:
                 items = Blog.find(name)
@@ -83,10 +85,12 @@ def list_items(
                 posts = [item for item in items if item.type == BlogType.Post]
             else:
                 drafts, posts = (Blog.drafts, Blog.posts)
-    if posts is not None:
+    if posts:
         print_table(posts, title='[bold green]Posts', show_header=False)
-    if drafts is not None:
+    if drafts:
         print_table(drafts, title='[bold green]Drafts', show_header=False)
+    if not posts and not drafts:
+        print('[bold red]Nothing to show.')
 
 
 @app.command(name='open', rich_help_panel='Operation')
@@ -155,7 +159,7 @@ def remove(name: Annotated[str, Argument(help='Name of post or draft.', autocomp
         print(f'[bold red]No such item.')
         return
 
-    selected_items = items[0] if len(items) == 1 else check(
+    selected_items = items if len(items) == 1 else check(
         message=f'Found {len(items)} matches, select items to remove (Ctrl+A to select all, Ctrl+R to toggle selection):',
         choices={f'[{item.type.name}] {item.name}': item for item in items}
     )
@@ -184,7 +188,7 @@ def publish(name: Annotated[str, Argument(help='Name of draft.', autocompletion=
         )
     for item in items:
         item.publish()
-        print(f'Draft "{item.name}" published as "{item.file_path}"')
+        print(f'[bold]Draft "{item.name}" published as "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Operation')
@@ -204,7 +208,7 @@ def unpublish(name: Annotated[str, Argument(help='Name of post.', autocompletion
         )
     for item in items:
         item.unpublish()
-        print(f'Post "{item.name}" unpublished as "{item.file_path}"')
+        print(f'[bold]Post "{item.name}" unpublished as "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Configuration')
@@ -231,3 +235,24 @@ def init():
         print('[bold]Type "--help" for more information.')
     else:
         print('[bold red]Aborted.')
+
+
+@app.command(rich_help_panel='Operation')
+def rename(
+    name: Annotated[str, Argument(help='Name of post or draft.', autocompletion=complete_items(Blog.articles))],
+    new_name: Annotated[str, Argument(help='New name.')]
+):
+    """Rename a post or draft."""
+    items = Blog.find(name)
+    if len(items) == 0:
+        print('[bold red]No such item.')
+        return
+
+    item = items[0] if len(items) == 1 else select(
+        message=f'Found {len(items)} matches, select one to rename:',
+        choices={f'[{item.type.name}] {item.name}': item for item in items}
+    )
+
+    old_path = item.path
+    item.rename(new_name)
+    print(f'[bold]Renamed "{old_path}" to "{item.path}" successfully.')

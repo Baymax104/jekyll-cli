@@ -4,7 +4,7 @@ from typing import List, Dict
 
 from .config import Config
 from .item import Item, BlogType
-from .utils import path_filter, extract_item_name
+from .utils import path_filter, split_filename
 
 
 class __Blog:
@@ -27,13 +27,13 @@ class __Blog:
 
     @property
     def __posts_dict(self) -> Dict[str, Item]:
-        if not self.__post_items:
+        if self.__post_items is None:
             self.__post_items = self.__initialize_items(BlogType.Post)
         return self.__post_items
 
     @property
     def __drafts_dict(self) -> Dict[str, Item]:
-        if not self.__draft_items:
+        if self.__draft_items is None:
             self.__draft_items = self.__initialize_items(BlogType.Draft)
         return self.__draft_items
 
@@ -63,7 +63,7 @@ class __Blog:
 
         items = {}
         for item_path in [f for f in parent_dir.iterdir() if path_filter(Config.mode, f)]:
-            name = extract_item_name(type_.name, item_path.name) if Config.mode == 'single' else item_path.name
+            name = split_filename(item_path.stem)[1] if Config.mode == 'single' else item_path.stem
             items[name] = Item(name, type_, item_path)
         return items
 

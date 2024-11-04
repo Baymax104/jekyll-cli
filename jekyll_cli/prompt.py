@@ -19,6 +19,12 @@ def print_table(items: List[Any], **table_config):
         return
     table = Table(**table_config)
     table.add_column()
+
+    if len(items) == 1:
+        table.add_row(f"[bold][green][1][/] {items[0]}")
+        print(table)
+        return
+
     table.add_column()
     for i in range(0, len(items), 2):
         item1 = f"[bold][green][{i + 1}][/] {items[i]}"

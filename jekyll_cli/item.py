@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, Any, Literal
 
 from .config import Config
-from .utils import read_markdown, write_markdown
+from .utils import read_markdown, write_markdown, split_filename
 
 
 class BlogType(Enum):
@@ -171,6 +171,18 @@ class Item:
         }
         infos = dict(infos, **formatter)
         return infos
+
+    def rename(self, new_name: str):
+        if self.path is None or self.file_path is None:
+            raise ValueError('Item path or file path is null.')
+
+        new_stem = f'{split_filename(self.file_path.stem)[0]}-{new_name}' if self.type == BlogType.Post else new_name
+        self.__file_path = self.file_path.rename(self.file_path.with_stem(new_stem))
+
+        if Config.mode == 'item':
+            self.__path = self.path.rename(self.path.with_name(new_name))
+        else:
+            self.__path = self.__file_path
 
     def __move_item(self, dest: Literal['_posts', '_drafts']):
         src_parent_dir = self.__parent_dir
