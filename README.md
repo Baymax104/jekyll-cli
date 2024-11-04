@@ -24,6 +24,7 @@ $ blog [OPTIONS] COMMAND [ARGS]...
 * `post`: Create a post.
 * `publish`: Publish a draft.
 * `remove`: Remove a post or draft.
+* `rename`: Rename a post or draft.
 * `serve`: Start blog server locally through jekyll.
 * `unpublish`: Unpublish a post.
 
@@ -244,6 +245,25 @@ $ blog remove [OPTIONS] NAME
 
 * `--help`: Show this message and exit.
 
+## `blog rename`
+
+Rename a post or draft.
+
+**Usage**:
+
+```console
+$ blog rename [OPTIONS] NAME NEW_NAME
+```
+
+**Arguments**:
+
+* `NAME`: Name of post or draft.  [required]
+* `NEW_NAME`: New name.  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
 ## `blog serve`
 
 Start blog server locally through jekyll.
@@ -257,7 +277,7 @@ $ blog serve [OPTIONS]
 **Options**:
 
 * `--draft / --no-draft`: Start blog server with drafts.  [default: no-draft]
-* `--port INTEGER`: Listen on the given port.  [default: 4001]
+* `--port INTEGER`: Listen on the given port.  [default: 4000]
 * `--help`: Show this message and exit.
 
 ## `blog unpublish`
