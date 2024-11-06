@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 from typing import Annotated, Any
 
-from rich import print_json
 from typer import Typer, Argument
 
+from .prompt import print_config
 from .config import Config
 from .prompt import print
 from .utils import convert_literal, check_configuration
@@ -19,7 +19,7 @@ app = Typer(
 @app.command(name='list')
 def list_config():
     """List all configurations."""
-    print_json(Config.json)
+    print_config(Config.to_dict())
 
 
 @app.command(name='set')

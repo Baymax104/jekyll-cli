@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-import json
 from pathlib import Path
 from typing import Dict, Any
 
@@ -95,9 +94,8 @@ class __Config:
         self.__config = OC.unsafe_merge(self.__config, other_config)
         OC.save(self.__config, self.__config_path)
 
-    @property
-    def json(self) -> str:
-        return json.dumps(OC.to_container(self.__config, resolve=True))
+    def to_dict(self) -> Dict[str, Any]:
+        return OC.to_container(self.__config, resolve=True)
 
     def __str__(self):
         return OC.to_yaml(self.__config)

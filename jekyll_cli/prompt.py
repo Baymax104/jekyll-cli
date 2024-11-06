@@ -42,6 +42,15 @@ def print_info(info: Dict[str, Any]):
     print(table)
 
 
+def print_config(config: Dict[str, Any], prefix=''):
+    for key, value in config.items():
+        key = f'{prefix}.{key}' if prefix else key
+        if isinstance(value, Dict):
+            print_config(value, key)
+        else:
+            print(f'{key} = {value}')
+
+
 class Progress:
 
     def __init__(self, description):
