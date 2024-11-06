@@ -95,7 +95,8 @@ def list_items(
 
 @app.command(name='open', rich_help_panel='Operation')
 def open_item(
-    name: Annotated[str, Argument(help='Name of post or draft.', autocompletion=complete_items(Blog.articles))]
+    name: Annotated[str, Argument(help='Name of post or draft.', autocompletion=complete_items(Blog.articles))],
+    editor: Annotated[str, Option('--editor', '-e', help='Open item in given editor')] = None,
 ):
     """Open post or draft in editor."""
     items = Blog.find(name)
@@ -107,8 +108,10 @@ def open_item(
         message=f'Found {len(items)} matches, select one to open:',
         choices={f'[{item.type.name}] {item.name}': item for item in items}
     )
+    if not editor:
+        editor = Config.select('default.editor')
     with Progress(f'Opening {item.file_path}'):
-        item.open()
+        item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')
@@ -117,7 +120,7 @@ def draft(
     title: Annotated[str, Option('--title', '-t', help='Title of draft.')] = None,
     class_: Annotated[List[str], Option('--class', '-c', help='Categories of draft.')] = None,
     tag: Annotated[List[str], Option('--tag', '-g', help='Tags of draft.')] = None,
-    open_: Annotated[bool, Option('--open', '-o', help='Open draft after creation.')] = False
+    editor: Annotated[str, Option('--editor', '-e', help='Open draft in given editor.')] = None
 ):
     """Create a draft."""
     item = Item(name, BlogType.Draft)
@@ -125,10 +128,11 @@ def draft(
         print(f'[bold red]Draft "{item.name}" already exists.')
         return
     item.create(title, class_, tag)
-    print(f'[bold]{item.file_path} [green]created as draft successfully.')
-    if open_:
-        with Progress('Opening draft...'):
-            item.open()
+    print(f'[bold]"{item.file_path}" created successfully.')
+    if not editor:
+        editor = Config.select('default.editor')
+    with Progress('Opening draft...'):
+        item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')
@@ -137,7 +141,7 @@ def post(
     title: Annotated[str, Option('--title', '-t', help='Title of post.')] = None,
     class_: Annotated[List[str], Option('--class', '-c', help='Categories of post.')] = None,
     tag: Annotated[List[str], Option('--tag', '-g', help='Tags of post.')] = None,
-    open_: Annotated[bool, Option('--open', '-o', help='Open post after creation.')] = False
+    editor: Annotated[str, Option('--editor', '-e', help='Open post in given editor.')] = None
 ):
     """Create a post."""
     item = Item(name, BlogType.Post)
@@ -145,10 +149,11 @@ def post(
         print(f'[bold red]Post "{item.name}" already exists.')
         return
     item.create(title, class_, tag)
-    print(f'[bold]{item.file_path} [green]created as post successfully.')
-    if open_:
-        with Progress('Opening post...'):
-            item.open()
+    print(f'[bold]"{item.file_path}" created successfully.')
+    if not editor:
+        editor = Config.select('default.editor')
+    with Progress('Opening post...'):
+        item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')

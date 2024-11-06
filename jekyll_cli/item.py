@@ -108,9 +108,9 @@ class Item:
             formatter['tags'] = tag
         write_markdown(file_path, formatter)
 
-    def open(self):
+    def open(self, editor=None):
         if self.file_path:
-            os.system(f'start {self.file_path}')
+            os.system(f'{editor if editor else "start"} {self.file_path}')
 
     def remove(self):
         if not self.path:

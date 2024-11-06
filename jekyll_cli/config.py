@@ -13,7 +13,8 @@ class __Config:
             'draft': False,
             'port': 4000
         },
-        'default-formatter': {
+        'default': {
+            'editor': None,
             'draft': {
                 'layout': 'post',
                 'title': None,
@@ -75,11 +76,11 @@ class __Config:
         return self.__mode
 
     def get_formatter(self, type_: str) -> Dict[str, Any]:
-        formatter = self.select(f'default-formatter.{type_.lower()}', default={})
+        formatter = self.select(f'default.{type_.lower()}', default={})
         return OC.to_container(formatter, resolve=True)
 
-    def select(self, key, **kwargs):
-        return OC.select(self.__config, key, **kwargs)
+    def select(self, key, default=None) -> Any | None:
+        return OC.select(self.__config, key, default=default)
 
     def update(self, key, value):
         OC.update(self.__config, key, value, merge=False)
