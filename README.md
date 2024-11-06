@@ -60,6 +60,7 @@ $ blog config [OPTIONS] COMMAND [ARGS]...
 **Commands**:
 
 * `list`: List all configurations.
+* `reset`: Reset default configuration.
 * `set`: Set a configuration.
 
 ### `blog config list`
@@ -70,6 +71,20 @@ List all configurations.
 
 ```console
 $ blog config list [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `blog config reset`
+
+Reset default configuration.
+
+**Usage**:
+
+```console
+$ blog config reset [OPTIONS]
 ```
 
 **Options**:
@@ -114,7 +129,7 @@ $ blog draft [OPTIONS] NAME
 * `-t, --title TEXT`: Title of draft.
 * `-c, --class TEXT`: Categories of draft.
 * `-g, --tag TEXT`: Tags of draft.
-* `-o, --open`: Open draft after creation.
+* `-e, --editor TEXT`: Open draft in given editor.
 * `--help`: Show this message and exit.
 
 ## `blog info`
@@ -185,6 +200,7 @@ $ blog open [OPTIONS] NAME
 
 **Options**:
 
+* `-e, --editor TEXT`: Open item in given editor
 * `--help`: Show this message and exit.
 
 ## `blog post`
@@ -206,7 +222,7 @@ $ blog post [OPTIONS] NAME
 * `-t, --title TEXT`: Title of post.
 * `-c, --class TEXT`: Categories of post.
 * `-g, --tag TEXT`: Tags of post.
-* `-o, --open`: Open post after creation.
+* `-e, --editor TEXT`: Open post in given editor.
 * `--help`: Show this message and exit.
 
 ## `blog publish`
