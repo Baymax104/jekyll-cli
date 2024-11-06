@@ -110,8 +110,8 @@ def open_item(
     )
     if not editor:
         editor = Config.select('default.editor')
-    with Progress(f'Opening {item.file_path}'):
-        item.open(editor=editor)
+    print(f'Opening "{item.file_path}"...')
+    item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')
@@ -131,8 +131,8 @@ def draft(
     print(f'[bold]"{item.file_path}" created successfully.')
     if not editor:
         editor = Config.select('default.editor')
-    with Progress('Opening draft...'):
-        item.open(editor=editor)
+    print('Opening draft...')
+    item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')
@@ -152,8 +152,8 @@ def post(
     print(f'[bold]"{item.file_path}" created successfully.')
     if not editor:
         editor = Config.select('default.editor')
-    with Progress('Opening post...'):
-        item.open(editor=editor)
+    print('Opening post...')
+    item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')

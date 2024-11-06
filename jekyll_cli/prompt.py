@@ -6,7 +6,6 @@ from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from InquirerPy.validator import PathValidator
 from rich.console import Console
-from rich.progress import Progress as _Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 __console = Console()
@@ -49,19 +48,6 @@ def print_config(config: Dict[str, Any], prefix=''):
             print_config(value, key)
         else:
             print(f'{key} = {value}')
-
-
-class Progress:
-
-    def __init__(self, description):
-        self.progress = _Progress(SpinnerColumn(), TextColumn('{task.description}'))
-        self.progress.add_task(description=description)
-
-    def __enter__(self):
-        self.progress.start()
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.progress.stop()
 
 
 def select(message, choices: List[Any] | Dict[str, Any]) -> Any:
