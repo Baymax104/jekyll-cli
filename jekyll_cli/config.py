@@ -94,6 +94,10 @@ class __Config:
         self.__config = OC.unsafe_merge(self.__config, other_config)
         OC.save(self.__config, self.__config_path)
 
+    def reset(self):
+        self.__config = OC.create(self.__DEFAULT_CONFIG__)
+        OC.save(self.__config, self.__config_path)
+
     def to_dict(self) -> Dict[str, Any]:
         return OC.to_container(self.__config, resolve=True)
 
