@@ -25,6 +25,8 @@ class Item:
         self.__parent_dir = Config.root / type_.value
         self.__path = path
         self.__file_path = file_path
+        self.__root: Path | None = Config.root
+        self.__mode: str = Config.mode
 
     @property
     def type(self):
@@ -40,7 +42,7 @@ class Item:
             return self.__file_path
 
         # in single mode, file_path equals to path
-        if Config.mode == 'single':
+        if self.__mode == 'single':
             self.__file_path = self.path
             return self.__file_path
 
@@ -49,8 +51,8 @@ class Item:
             return None
 
         # find .md file for item mode
-        pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}\.md$' if self.type == BlogType.Post else rf'^{self.name}\.md$'
-        matched = [f for f in self.path.iterdir() if re.match(pattern, f.name) and f.is_file()]
+        pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}$' if self.type == BlogType.Post else rf'^{self.name}$'
+        matched = [f for f in self.path.iterdir() if re.match(pattern, f.stem) and f.is_file()]
         self.__file_path = matched[0] if len(matched) > 0 else None
         return self.__file_path
 
@@ -68,13 +70,13 @@ class Item:
 
         item_path: Path | None = None
         for path in self.__parent_dir.iterdir():
-            if Config.mode == 'single':
-                pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.type == BlogType.Post else rf'^{self.name}.md$'
+            if self.__mode == 'single':
+                pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}$' if self.type == BlogType.Post else rf'^{self.name}$'
                 is_type_valid = path.is_file()
             else:
                 pattern = rf'^{self.name}$'
                 is_type_valid = path.is_dir()
-            if re.match(pattern, path.name) and is_type_valid:
+            if re.match(pattern, path.stem) and is_type_valid:
                 item_path = path
                 break
         self.__path = item_path
@@ -82,7 +84,7 @@ class Item:
 
     def create(self, title: str = None, class_: list[str] = None, tag: list[str] = None):
         # create item directories
-        if Config.mode == 'item':
+        if self.__mode == 'item':
             item_dir = self.__parent_dir / self.name
             assets_dir = item_dir / 'assets'
             item_dir.mkdir(exist_ok=True)
@@ -93,7 +95,7 @@ class Item:
         if self.type == BlogType.Post:
             filename = f'{time.strftime("%Y-%m-%d")}-{filename}'
 
-        file_path = self.__parent_dir / filename if Config.mode == 'single' else self.__parent_dir / self.name / filename
+        file_path = self.__parent_dir / filename if self.__mode == 'single' else self.__parent_dir / self.name / filename
         formatter = Config.get_formatter(self.__type.name)
 
         # fill current time
@@ -115,7 +117,7 @@ class Item:
     def remove(self):
         if not self.path:
             return
-        if Config.mode == 'single':
+        if self.__mode == 'single':
             self.path.unlink()
         else:
             shutil.rmtree(self.path)
@@ -179,7 +181,7 @@ class Item:
         new_stem = f'{split_filename(self.file_path.stem)[0]}-{new_name}' if self.type == BlogType.Post else new_name
         self.__file_path = self.file_path.rename(self.file_path.with_stem(new_stem))
 
-        if Config.mode == 'item':
+        if self.__mode == 'item':
             self.__path = self.path.rename(self.path.with_name(new_name))
         else:
             self.__path = self.__file_path
