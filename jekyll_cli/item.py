@@ -16,8 +16,10 @@ class Item:
     def __init__(self, name: str, type_: BlogType, path: Path | None = None, file_path: Path | None = None):
         self.name = name
         self.__type = type_
+        self.__root = Config.root
+        self.__mode = Config.mode
         # _posts or _drafts
-        self.__parent_dir = Config.root / type_.value
+        self.__parent_dir = self.__root / type_.value if self.__root is not None else None
         self.__path = path
         self.__file_path = file_path
 
@@ -35,7 +37,7 @@ class Item:
             return self.__file_path
 
         # in single mode, file_path equals to path
-        if Config.mode == 'single':
+        if self.__mode == 'single':
             self.__file_path = self.path
             return self.__file_path
 
@@ -77,7 +79,7 @@ class Item:
 
     def create(self, title: str = None, class_: list[str] = None, tag: list[str] = None):
         # create item directories
-        if Config.mode == 'item':
+        if self.__mode == 'item':
             item_dir = self.__parent_dir / self.name
             assets_dir = item_dir / 'assets'
             item_dir.mkdir(exist_ok=True)
@@ -88,7 +90,7 @@ class Item:
         if self.type == BlogType.Post:
             filename = f'{time.strftime("%Y-%m-%d")}-{filename}'
 
-        file_path = self.__parent_dir / filename if Config.mode == 'single' else self.__parent_dir / self.name / filename
+        file_path = self.__parent_dir / filename if self.__mode == 'single' else self.__parent_dir / self.name / filename
         formatter = Config.get_formatter(self.__type.name)
 
         # fill current time
@@ -110,7 +112,7 @@ class Item:
     def remove(self):
         if not self.path:
             return
-        if Config.mode == 'single':
+        if self.__mode == 'single':
             self.path.unlink()
         else:
             shutil.rmtree(self.path)
@@ -174,7 +176,7 @@ class Item:
         new_stem = f'{split_filename(self.file_path.stem)[0]}-{new_name}' if self.type == BlogType.Post else new_name
         self.__file_path = self.file_path.rename(self.file_path.with_stem(new_stem))
 
-        if Config.mode == 'item':
+        if self.__mode == 'item':
             self.__path = self.path.rename(self.path.with_name(new_name))
         else:
             self.__path = self.__file_path
