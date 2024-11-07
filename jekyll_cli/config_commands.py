@@ -3,9 +3,8 @@ from typing import Annotated, Any
 
 from typer import Typer, Argument
 
-from .prompt import print_config
 from .config import Config
-from .prompt import print
+from .prompt import print_config, print
 from .utils import convert_literal, check_configuration
 
 app = Typer(
@@ -30,11 +29,11 @@ def set_config(
     """Set a configuration."""
     check_configuration(key, value)
     Config.update(key, value)
-    print(f'[bold]Configuration "{key}" updated to "{value}" successfully.')
+    print(f'Configuration "{key}" updated to "{value}" successfully.')
 
 
 @app.command()
 def reset():
     """Reset default configuration."""
     Config.reset()
-    print(f'[bold green]Reset default configuration successfully.')
+    print(f'[green]Reset default configuration successfully.')

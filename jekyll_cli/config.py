@@ -9,7 +9,7 @@ class __Config:
     __DEFAULT_CONFIG__ = {
         'root': None,
         'mode': 'single',
-        'deploy': {
+        'generate': {
             'draft': False,
             'port': 4000
         },
@@ -31,22 +31,35 @@ class __Config:
         }
     }
 
+    __DEPLOY_CONFIG__ = {
+        'deploy': {
+            'steps': [
+                {'name': None, 'command': None},
+                {'name': None, 'command': None},
+            ]
+        }
+    }
+
+
     def __init__(self):
         app_home = Path().home() / '.jekyll-cli'
-        self.__config_path = app_home / 'config.yml'
         self.__root: Path | None = None
         self.__mode: str | None = None
+        self.config_path = app_home / 'config.yml'
+        # TODO 修复self.root
+        self.deploy_path: Path | None = self.root / 'jekyll-deploy.yml' if self.root is not None else None
 
         # create app home
         app_home.mkdir(exist_ok=True)
 
-        if not self.__config_path.exists():
+        if not self.config_path.exists():
             # create config.yml
             self.__config = OC.create(self.__DEFAULT_CONFIG__)
-            OC.save(self.__config, self.__config_path)
+            OC.save(self.__config, self.config_path)
         else:
             # read config
-            self.__config = OC.load(self.__config_path)
+            self.__config = OC.load(self.config_path)
+
 
     @property
     def root(self) -> Path | None:
@@ -62,6 +75,7 @@ class __Config:
         self.__root = root
         return self.__root
 
+
     @property
     def mode(self) -> str:
         if self.__mode is not None:
@@ -75,12 +89,18 @@ class __Config:
         self.__mode = mode
         return self.__mode
 
+
     def get_formatter(self, type_: str) -> Dict[str, Any]:
         formatter = self.select(f'default.{type_.lower()}', default={})
         return OC.to_container(formatter, resolve=True)
 
-    def select(self, key, default=None) -> Any | None:
+
+    def select(self, key, default=None, deploy=False) -> Any | None:
+        if deploy:
+            deploy_config = OC.load(self.deploy_path)
+            return OC.select(deploy_config, key, default=default)
         return OC.select(self.__config, key, default=default)
+
 
     def update(self, key, value):
         OC.update(self.__config, key, value, merge=False)
@@ -88,19 +108,29 @@ class __Config:
             self.__root = value
         elif key == 'mode':
             self.__mode = value
-        OC.save(self.__config, self.__config_path)
+        OC.save(self.__config, self.config_path)
+
 
     def merge(self, config: Dict):
         other_config = OC.create(config)
         self.__config = OC.unsafe_merge(self.__config, other_config)
-        OC.save(self.__config, self.__config_path)
+        OC.save(self.__config, self.config_path)
+
 
     def reset(self):
         self.__config = OC.create(self.__DEFAULT_CONFIG__)
-        OC.save(self.__config, self.__config_path)
+        OC.save(self.__config, self.config_path)
+
+
+    def init_deploy(self):
+        self.deploy_path = self.root / 'jekyll-deploy.yml'
+        deploy = OC.create(self.__DEPLOY_CONFIG__)
+        OC.save(deploy, self.deploy_path)
+
 
     def to_dict(self) -> Dict[str, Any]:
         return OC.to_container(self.__config, resolve=True)
+
 
     def __str__(self):
         return OC.to_yaml(self.__config)

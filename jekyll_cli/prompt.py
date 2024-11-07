@@ -20,24 +20,24 @@ def print_table(items: List[Any], **table_config):
     table.add_column()
 
     if len(items) == 1:
-        table.add_row(f"[bold][green][1][/] {items[0]}")
+        table.add_row(f"[green][1][/] {items[0]}")
         print(table)
         return
 
     table.add_column()
     for i in range(0, len(items), 2):
-        item1 = f"[bold][green][{i + 1}][/] {items[i]}"
-        item2 = f"[bold][green][{i + 2}][/] {items[i + 1]}" if i + 1 < len(items) else ""
+        item1 = f"[green][{i + 1}][/] {items[i]}"
+        item2 = f"[green][{i + 2}][/] {items[i + 1]}" if i + 1 < len(items) else ""
         table.add_row(item1, item2)
     print(table)
 
 
-def print_info(info: Dict[str, Any]):
-    table = Table(show_header=False)
+def print_info(info: Dict[str, Any], **table_config):
+    table = Table(**table_config)
     table.add_column()
     table.add_column()
     for key, value in info.items():
-        table.add_row(f'[bold green]{key.capitalize()}', f'[bold]{value}')
+        table.add_row(f'[bold green]{key.capitalize()}', str(value))
     print(table)
 
 

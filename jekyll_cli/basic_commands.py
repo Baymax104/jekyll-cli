@@ -1,13 +1,16 @@
 # -*- coding: UTF-8 -*-
 import os
+import subprocess
 from typing import Annotated
 
-from typer import Typer, Option, Argument
+import typer
+from typer import Typer, Option, Argument, Context
 
 from .blog import Blog
 from .config import Config
 from .config_commands import app as config_app
-from .item import Item, BlogType
+from .enums import BlogType
+from .item import Item
 from .prompt import *
 from .utils import complete_items
 
@@ -20,32 +23,38 @@ app = Typer(
 app.add_typer(config_app, rich_help_panel='Configuration')
 
 
-@app.command(rich_help_panel='Deployment')
+@app.callback()
+def check(context: Context):
+    if context.invoked_subcommand != 'init' and context.invoked_subcommand != 'config':
+        if Config.root is None:
+            print('[red]No blog root. Use "blog init" to initialize the blog.')
+            raise typer.Exit(code=1)
+
+
+@app.command(rich_help_panel='Generation')
 def serve(
-    draft: Annotated[bool, Option(help='Start blog server with drafts.')] = Config.select('deploy.draft'),
-    port: Annotated[int, Option(help='Listen on the given port.')] = Config.select('deploy.port')
+    draft: Annotated[bool, Option(help='Start blog server with drafts.')] = Config.select('generate.draft'),
+    port: Annotated[int, Option(help='Listen on the given port.')] = Config.select('generate.port')
 ):
     """Start blog server locally through jekyll."""
-    if Config.root is not None:
-        os.chdir(Config.root)
-    command = 'bundle exec jekyll serve'
+    os.chdir(Config.root)
+    command = ['bundle', 'exec', 'jekyll', 'serve']
     # draft option
     if draft:
-        command += ' --drafts'
+        command.append('--drafts')
     if port is not None:
-        command += f' --port {port}'
-    os.system(command)
+        command.append(f'--port {port}')
+    subprocess.run(command, shell=True)
 
 
-@app.command(rich_help_panel='Deployment')
-def build(draft: Annotated[bool, Option(help='Build including drafts.')] = Config.select('deploy.draft')):
+@app.command(rich_help_panel='Generation')
+def build(draft: Annotated[bool, Option(help='Build including drafts.')] = Config.select('generate.draft')):
     """Build jekyll site."""
-    if Config.root is not None:
-        os.chdir(Config.root)
-    command = 'bundle exec jekyll build'
+    os.chdir(Config.root)
+    command = ['bundle', 'exec', 'jekyll', 'build']
     if draft:
-        command += ' --drafts'
-    os.system(command)
+        command.append('--drafts')
+    subprocess.run(command, shell=True)
 
 
 @app.command(rich_help_panel='Operation')
@@ -53,15 +62,14 @@ def info(name: Annotated[str, Argument(help='Name of post or draft.', autocomple
     """Show info about post or draft."""
     items = Blog.find(name)
     if len(items) == 0:
-        print('[bold red]No such item.')
+        print('[red]No such item.')
         return
 
     item = items[0] if len(items) == 1 else select(
         message=f'Found {len(items)} matches, select one to check:',
         choices={f'[{item.type.name}] {item.name}': item for item in items}
     )
-    rule('[bold green]Info')
-    print_info(item.info())
+    print_info(item.info(), title='[bold green]Info', show_header=False)
 
 
 @app.command(name='list', rich_help_panel='Operation')
@@ -90,7 +98,7 @@ def list_items(
     if drafts:
         print_table(drafts, title='[bold green]Drafts', show_header=False)
     if not posts and not drafts:
-        print('[bold red]Nothing to show.')
+        print('[red]Nothing to show.')
 
 
 @app.command(name='open', rich_help_panel='Operation')
@@ -101,7 +109,7 @@ def open_item(
     """Open post or draft in editor."""
     items = Blog.find(name)
     if len(items) == 0:
-        print(f'[bold red]No such item.')
+        print(f'[red]No such item.')
         return
 
     item = items[0] if len(items) == 1 else select(
@@ -125,14 +133,13 @@ def draft(
     """Create a draft."""
     item = Item(name, BlogType.Draft)
     if item in Blog:
-        print(f'[bold red]Draft "{item.name}" already exists.')
+        print(f'[red]Draft "{item.name}" already exists.')
         return
     item.create(title, class_, tag)
-    print(f'[bold]"{item.file_path}" created successfully.')
-    if not editor:
-        editor = Config.select('default.editor')
-    print('Opening draft...')
-    item.open(editor=editor)
+    print(f'"{item.file_path}" created successfully.')
+    if editor:
+        print('Opening draft...')
+        item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')
@@ -146,14 +153,13 @@ def post(
     """Create a post."""
     item = Item(name, BlogType.Post)
     if item in Blog:
-        print(f'[bold red]Post "{item.name}" already exists.')
+        print(f'[red]Post "{item.name}" already exists.')
         return
     item.create(title, class_, tag)
-    print(f'[bold]"{item.file_path}" created successfully.')
-    if not editor:
-        editor = Config.select('default.editor')
-    print('Opening post...')
-    item.open(editor=editor)
+    print(f'"{item.file_path}" created successfully.')
+    if editor:
+        print('Opening post...')
+        item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')
@@ -161,7 +167,7 @@ def remove(name: Annotated[str, Argument(help='Name of post or draft.', autocomp
     """Remove a post or draft."""
     items = Blog.find(name)
     if len(items) == 0:
-        print(f'[bold red]No such item.')
+        print(f'[red]No such item.')
         return
 
     selected_items = items if len(items) == 1 else check(
@@ -173,7 +179,7 @@ def remove(name: Annotated[str, Argument(help='Name of post or draft.', autocomp
     if confirm(f'Found {len(items)} matches, remove above items?'):
         for item in items:
             item.remove()
-        print('[bold green]Remove successfully.')
+        print('[green]Remove successfully.')
 
 
 @app.command(rich_help_panel='Operation')
@@ -183,7 +189,7 @@ def publish(name: Annotated[str, Argument(help='Name of draft.', autocompletion=
 
     if len(items) == 0:
         print_table(Blog.drafts, title='[bold green]Drafts', show_header=False)
-        print('[bold red]No such item in _drafts.')
+        print('[red]No such item in _drafts.')
         return
 
     if len(items) != 1:
@@ -193,7 +199,7 @@ def publish(name: Annotated[str, Argument(help='Name of draft.', autocompletion=
         )
     for item in items:
         item.publish()
-        print(f'[bold]Draft "{item.name}" published as "{item.file_path}"')
+        print(f'Draft "{item.name}" published as "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Operation')
@@ -203,7 +209,7 @@ def unpublish(name: Annotated[str, Argument(help='Name of post.', autocompletion
 
     if len(items) == 0:
         print_table(Blog.posts, title='[bold green]Posts', show_header=False)
-        print('[bold red]No such item in _posts.')
+        print('[red]No such item in _posts.')
         return
 
     if len(items) != 1:
@@ -213,7 +219,7 @@ def unpublish(name: Annotated[str, Argument(help='Name of post.', autocompletion
         )
     for item in items:
         item.unpublish()
-        print(f'[bold]Post "{item.name}" unpublished as "{item.file_path}"')
+        print(f'Post "{item.name}" unpublished as "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Configuration')
@@ -232,14 +238,20 @@ def init():
 
     rule()
     print('You have entered the following configurations:')
-    print_info({'Blog root path': str(root), 'Management mode': mode})
+    print_info({'Blog root path': str(root), 'Management mode': mode}, show_header=False)
 
     if confirm('Confirm your basic configurations?', default=True):
         Config.merge({'root': str(root), 'mode': mode})
+        Config.init_deploy()
         print('[bold green]Basic configuration set up successfully!')
-        print('[bold]Type "--help" for more information.')
+        print('Generate config files:')
+        print_info({
+            'Blog configuration': str(Config.config_path),
+            'Deploy configuration': str(Config.deploy_path),
+        }, show_header=False)
+        print('Type "--help" for more information.')
     else:
-        print('[bold red]Aborted.')
+        print('[red]Aborted.')
 
 
 @app.command(rich_help_panel='Operation')
@@ -250,7 +262,7 @@ def rename(
     """Rename a post or draft."""
     items = Blog.find(name)
     if len(items) == 0:
-        print('[bold red]No such item.')
+        print('[red]No such item.')
         return
 
     item = items[0] if len(items) == 1 else select(
@@ -260,4 +272,17 @@ def rename(
 
     old_path = item.path
     item.rename(new_name)
-    print(f'[bold]Renamed "{old_path}" to "{item.path}" successfully.')
+    print(f'Renamed "{old_path}" to "{item.path}" successfully.')
+
+
+@app.command(rich_help_panel='Generation')
+def deploy():
+    """Deploy the site with the '<root>/jekyll-deploy.sh.'"""
+    deploy_path = Config.root / 'jekyll-deploy.yml'
+    if not deploy_path.exists():
+        print('[red]No deploy configuration found.')
+        return
+
+    steps = Config.select('deploy.steps', deploy=True)
+    for step in steps:
+        print(step)

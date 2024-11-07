@@ -55,13 +55,12 @@ def complete_items(candidates: List[Any]) -> Callable[[str], List[str]]:
     return complete
 
 
-def path_filter(mode: str, path: Path) -> bool:
-    return (path.is_file() and path.suffix == '.md') if mode == 'single' else path.is_dir()
+def filter_path(mode: str, path: Path) -> bool:
+    return path.is_file() if mode == 'single' else path.is_dir()
 
 
-def split_filename(filename: str) -> Tuple[str, str]:
+def split_filename(filename: str) -> Tuple[str, str] | None:
     if not re.match(r'\d{4}-\d{2}-\d{2}-(.+)', filename):
-        return filename, filename
-
-    parts = filename.split('-', 3)
-    return '-'.join(parts[0:3]), parts[3]
+        return None
+    parts = re.match(r'(\d{4}-\d{2}-\d{2})-(.+)', filename)
+    return parts.group(1), parts.group(2)
