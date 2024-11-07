@@ -16,6 +16,7 @@ $ blog [OPTIONS] COMMAND [ARGS]...
 
 * `build`: Build jekyll site.
 * `config`: Configuration Subcommands.
+* `deploy`: Deploy the site with the...
 * `draft`: Create a draft.
 * `info`: Show info about post or draft.
 * `init`: Initialize the application interactively.
@@ -105,6 +106,20 @@ $ blog config set [OPTIONS] KEY VALUE
 
 * `KEY`: Configuration key using dot-notation.  [required]
 * `VALUE`: Configuration value.  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+## `blog deploy`
+
+Deploy the site with the '<root>/jekyll-deploy.yml.'
+
+**Usage**:
+
+```console
+$ blog deploy [OPTIONS]
+```
 
 **Options**:
 
