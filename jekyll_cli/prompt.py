@@ -4,7 +4,8 @@ from typing import List, Any, Dict
 
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
-from InquirerPy.validator import PathValidator
+from prompt_toolkit.document import Document
+from prompt_toolkit.validation import Validator, ValidationError
 from rich.console import Console
 from rich.table import Table
 
@@ -84,12 +85,33 @@ def confirm(message, default=False) -> bool:
     return inquirer.confirm(message, default=default).execute()
 
 
-def input_directory_path(message) -> Path:
+class PathValidator(Validator):
+
+    def validate(self, document: Document) -> None:
+        if not len(document.text) > 0:
+            raise ValidationError(
+                message='Input cannot be empty',
+                cursor_position=document.cursor_position,
+            )
+        path = Path(document.text).expanduser()
+        if not path.is_dir():
+            raise ValidationError(
+                message='Input is not a valid path',
+                cursor_position=document.cursor_position,
+            )
+        elif not path.exists():
+            raise ValidationError(
+                message='Input is not a valid path',
+                cursor_position=document.cursor_position,
+            )
+
+
+def input_directory_path(message) -> str:
     return inquirer.filepath(
         message=message,
         vi_mode=True,
         only_directories=True,
         multicolumn_complete=True,
-        validate=PathValidator(is_dir=True, message='Input is not a directory.'),
-        filter=lambda path: Path(path).resolve()
+        validate=PathValidator(),
+        filter=lambda path: str(Path(path).resolve())
     ).execute()

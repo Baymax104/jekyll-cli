@@ -52,6 +52,7 @@ def complete_items(candidates: List[Any]) -> Callable[[str], List[str]]:
     def complete(incomplete: str) -> List[str]:
         return [str(candidate) for candidate in candidates if str(candidate).startswith(incomplete)]
 
+
     return complete
 
 

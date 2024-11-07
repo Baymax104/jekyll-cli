@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*-
 from typing import Annotated, Any
 
-from typer import Typer, Argument
+import typer
+from typer import Typer, Argument, Context
 
 from .config import Config
 from .prompt import print_config, print
@@ -13,6 +14,14 @@ app = Typer(
     help='Configuration Subcommands.',
     rich_markup_mode='rich',
 )
+
+
+@app.callback()
+def check(context: Context):
+    if context.invoked_subcommand != 'list':
+        if Config.root is None:
+            print('[red]No blog root. Use "blog init" to initialize the blog.')
+            raise typer.Exit(code=1)
 
 
 @app.command(name='list')

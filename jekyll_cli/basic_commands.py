@@ -235,14 +235,18 @@ def init():
             'item (A directory containing a markdown file and an assets directory denotes a blog item.)': 'item'
         }
     )
+    deploy = confirm('Generate deploy configuration file "jekyll-deploy.yml"?', default=True)
 
     rule()
     print('You have entered the following configurations:')
-    print_info({'Blog root path': str(root), 'Management mode': mode}, show_header=False)
+    print_info({
+        'Blog root path': root,
+        'Management mode': mode,
+        'Generate deploy configuration': deploy
+    }, show_header=False)
 
-    if confirm('Confirm your basic configurations?', default=True):
-        Config.merge({'root': str(root), 'mode': mode})
-        Config.init_deploy()
+    if confirm('Confirm your configurations?', default=True):
+        Config.init(root, mode, deploy)
         print('[bold green]Basic configuration set up successfully!')
         print('Generate config files:')
         print_info({
@@ -277,12 +281,24 @@ def rename(
 
 @app.command(rich_help_panel='Generation')
 def deploy():
-    """Deploy the site with the '<root>/jekyll-deploy.sh.'"""
-    deploy_path = Config.root / 'jekyll-deploy.yml'
-    if not deploy_path.exists():
+    """Deploy the site with the '<root>/jekyll-deploy.yml.'"""
+    steps = Config.select('deploy.steps')
+    if steps is None:
         print('[red]No deploy configuration found.')
         return
 
-    steps = Config.select('deploy.steps', deploy=True)
+    os.chdir(Config.root)
     for step in steps:
-        print(step)
+        command = step.get('command')
+        if not command:
+            continue
+        name = step.get('name', command)
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        if result.returncode == 0:
+            print(f'[green]Run "{name}" successfully.')
+            if result.stdout:
+                print(result.stdout)
+        else:
+            print(f'[red]Run "{name}" failed, the details are shown below:')
+            print(f'[red]{result.stderr}')
+            break

@@ -32,12 +32,10 @@ class __Config:
     }
 
     __DEPLOY_CONFIG__ = {
-        'deploy': {
-            'steps': [
-                {'name': None, 'command': None},
-                {'name': None, 'command': None},
-            ]
-        }
+        'steps': [
+            {'name': None, 'command': None},
+            {'name': None, 'command': None},
+        ]
     }
 
 
@@ -46,8 +44,7 @@ class __Config:
         self.__root: Path | None = None
         self.__mode: str | None = None
         self.config_path = app_home / 'config.yml'
-        # TODO 修复self.root
-        self.deploy_path: Path | None = self.root / 'jekyll-deploy.yml' if self.root is not None else None
+        self.deploy_path = None
 
         # create app home
         app_home.mkdir(exist_ok=True)
@@ -59,6 +56,14 @@ class __Config:
         else:
             # read config
             self.__config = OC.load(self.config_path)
+
+        if self.root is not None:
+            self.deploy_path = self.root / 'jekyll-deploy.yml'
+            if not self.deploy_path.exists():
+                self.__deploy_config = OC.create(self.__DEPLOY_CONFIG__)
+                OC.save(self.__deploy_config, self.deploy_path)
+            else:
+                self.__deploy_config = OC.load(self.deploy_path)
 
 
     @property
@@ -81,11 +86,9 @@ class __Config:
         if self.__mode is not None:
             return self.__mode
 
-        mode: str | None = OC.select(self.__config, 'mode')
-        if not mode:
-            raise ValueError('Key "mode" is missing.')
-        elif mode not in ['single', 'item']:
-            raise ValueError('Unexpected value of mode, it can only be "single" or "item".')
+        mode: str = OC.select(self.__config, 'mode', default='single')
+        if mode not in ['single', 'item']:
+            raise ValueError('Unexpected value of mode.')
         self.__mode = mode
         return self.__mode
 
@@ -95,11 +98,13 @@ class __Config:
         return OC.to_container(formatter, resolve=True)
 
 
-    def select(self, key, default=None, deploy=False) -> Any | None:
-        if deploy:
-            deploy_config = OC.load(self.deploy_path)
-            return OC.select(deploy_config, key, default=default)
-        return OC.select(self.__config, key, default=default)
+    def select(self, key: str, default=None) -> Any | None:
+        if key.startswith('deploy'):
+            key = key.strip('deploy')
+            config = self.__deploy_config
+        else:
+            config = self.__config
+        return OC.select(config, key, default=default)
 
 
     def update(self, key, value):
@@ -111,21 +116,19 @@ class __Config:
         OC.save(self.__config, self.config_path)
 
 
-    def merge(self, config: Dict):
-        other_config = OC.create(config)
-        self.__config = OC.unsafe_merge(self.__config, other_config)
-        OC.save(self.__config, self.config_path)
-
-
     def reset(self):
         self.__config = OC.create(self.__DEFAULT_CONFIG__)
         OC.save(self.__config, self.config_path)
 
 
-    def init_deploy(self):
-        self.deploy_path = self.root / 'jekyll-deploy.yml'
-        deploy = OC.create(self.__DEPLOY_CONFIG__)
-        OC.save(deploy, self.deploy_path)
+    def init(self, root, mode, deploy):
+        self.__config = OC.unsafe_merge(self.__config, {'root': root, 'mode': mode})
+        OC.save(self.__config, self.config_path)
+
+        if deploy:
+            self.deploy_path = self.root / 'jekyll-deploy.yml'
+            self.__deploy_config = OC.create(self.__DEPLOY_CONFIG__)
+            OC.save(self.__deploy_config, self.deploy_path)
 
 
     def to_dict(self) -> Dict[str, Any]:
