@@ -29,11 +29,11 @@ def set_config(
     """Set a configuration."""
     check_configuration(key, value)
     Config.update(key, value)
-    print(f'[bold]Configuration "{key}" updated to "{value}" successfully.')
+    print(f'Configuration "{key}" updated to "{value}" successfully.')
 
 
 @app.command()
 def reset():
     """Reset default configuration."""
     Config.reset()
-    print(f'[bold green]Reset default configuration successfully.')
+    print(f'[green]Reset default configuration successfully.')

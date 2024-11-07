@@ -54,7 +54,7 @@ def info(name: Annotated[str, Argument(help='Name of post or draft.', autocomple
     """Show info about post or draft."""
     items = Blog.find(name)
     if len(items) == 0:
-        print('[bold red]No such item.')
+        print('[red]No such item.')
         return
 
     item = items[0] if len(items) == 1 else select(
@@ -90,7 +90,7 @@ def list_items(
     if drafts:
         print_table(drafts, title='[bold green]Drafts', show_header=False)
     if not posts and not drafts:
-        print('[bold red]Nothing to show.')
+        print('[red]Nothing to show.')
 
 
 @app.command(name='open', rich_help_panel='Operation')
@@ -101,7 +101,7 @@ def open_item(
     """Open post or draft in editor."""
     items = Blog.find(name)
     if len(items) == 0:
-        print(f'[bold red]No such item.')
+        print(f'[red]No such item.')
         return
 
     item = items[0] if len(items) == 1 else select(
@@ -124,15 +124,15 @@ def draft(
 ):
     """Create a draft."""
     if Config.root is None:
-        print('[bold red]No blog root. Use "blog init" to initialize the blog.')
+        print('[red]No blog root. Use "blog init" to initialize the blog.')
         return
 
     item = Item(name, BlogType.Draft, root=Config.root, mode=Config.mode)
     if item in Blog:
-        print(f'[bold red]Draft "{item.name}" already exists.')
+        print(f'[red]Draft "{item.name}" already exists.')
         return
     item.create(title, class_, tag)
-    print(f'[bold]"{item.file_path}" created successfully.')
+    print(f'"{item.file_path}" created successfully.')
     if editor:
         print('Opening draft...')
         item.open(editor=editor)
@@ -148,15 +148,15 @@ def post(
 ):
     """Create a post."""
     if Config.root is None:
-        print('[bold red]No blog root. Use "blog init" to initialize the blog.')
+        print('[red]No blog root. Use "blog init" to initialize the blog.')
         return
 
     item = Item(name, BlogType.Post, root=Config.root, mode=Config.mode)
     if item in Blog:
-        print(f'[bold red]Post "{item.name}" already exists.')
+        print(f'[red]Post "{item.name}" already exists.')
         return
     item.create(title, class_, tag)
-    print(f'[bold]"{item.file_path}" created successfully.')
+    print(f'"{item.file_path}" created successfully.')
     if editor:
         print('Opening post...')
         item.open(editor=editor)
@@ -167,7 +167,7 @@ def remove(name: Annotated[str, Argument(help='Name of post or draft.', autocomp
     """Remove a post or draft."""
     items = Blog.find(name)
     if len(items) == 0:
-        print(f'[bold red]No such item.')
+        print(f'[red]No such item.')
         return
 
     selected_items = items if len(items) == 1 else check(
@@ -179,7 +179,7 @@ def remove(name: Annotated[str, Argument(help='Name of post or draft.', autocomp
     if confirm(f'Found {len(items)} matches, remove above items?'):
         for item in items:
             item.remove()
-        print('[bold green]Remove successfully.')
+        print('[green]Remove successfully.')
 
 
 @app.command(rich_help_panel='Operation')
@@ -189,7 +189,7 @@ def publish(name: Annotated[str, Argument(help='Name of draft.', autocompletion=
 
     if len(items) == 0:
         print_table(Blog.drafts, title='[bold green]Drafts', show_header=False)
-        print('[bold red]No such item in _drafts.')
+        print('[red]No such item in _drafts.')
         return
 
     if len(items) != 1:
@@ -199,7 +199,7 @@ def publish(name: Annotated[str, Argument(help='Name of draft.', autocompletion=
         )
     for item in items:
         item.publish()
-        print(f'[bold]Draft "{item.name}" published as "{item.file_path}"')
+        print(f'Draft "{item.name}" published as "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Operation')
@@ -209,7 +209,7 @@ def unpublish(name: Annotated[str, Argument(help='Name of post.', autocompletion
 
     if len(items) == 0:
         print_table(Blog.posts, title='[bold green]Posts', show_header=False)
-        print('[bold red]No such item in _posts.')
+        print('[red]No such item in _posts.')
         return
 
     if len(items) != 1:
@@ -219,7 +219,7 @@ def unpublish(name: Annotated[str, Argument(help='Name of post.', autocompletion
         )
     for item in items:
         item.unpublish()
-        print(f'[bold]Post "{item.name}" unpublished as "{item.file_path}"')
+        print(f'Post "{item.name}" unpublished as "{item.file_path}"')
 
 
 @app.command(rich_help_panel='Configuration')
@@ -243,9 +243,9 @@ def init():
     if confirm('Confirm your basic configurations?', default=True):
         Config.merge({'root': str(root), 'mode': mode})
         print('[bold green]Basic configuration set up successfully!')
-        print('[bold]Type "--help" for more information.')
+        print('Type "--help" for more information.')
     else:
-        print('[bold red]Aborted.')
+        print('[red]Aborted.')
 
 
 @app.command(rich_help_panel='Operation')
@@ -256,7 +256,7 @@ def rename(
     """Rename a post or draft."""
     items = Blog.find(name)
     if len(items) == 0:
-        print('[bold red]No such item.')
+        print('[red]No such item.')
         return
 
     item = items[0] if len(items) == 1 else select(
@@ -266,4 +266,4 @@ def rename(
 
     old_path = item.path
     item.rename(new_name)
-    print(f'[bold]Renamed "{old_path}" to "{item.path}" successfully.')
+    print(f'Renamed "{old_path}" to "{item.path}" successfully.')
