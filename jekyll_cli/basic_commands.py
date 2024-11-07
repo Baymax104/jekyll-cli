@@ -12,7 +12,7 @@ from .config_commands import app as config_app
 from .enums import BlogType
 from .item import Item
 from .prompt import *
-from .utils import complete_items
+from .utils import complete_items, decode_stdout
 
 app = Typer(
     no_args_is_help=True,
@@ -293,12 +293,13 @@ def deploy():
         if not command:
             continue
         name = step.get('name', command)
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = subprocess.run(command, shell=True, capture_output=True)
         if result.returncode == 0:
             print(f'[green]Run "{name}" successfully.')
             if result.stdout:
-                print(result.stdout)
+                print(decode_stdout(result.stdout))
         else:
             print(f'[red]Run "{name}" failed, the details are shown below:')
-            print(f'[red]{result.stderr}')
+            print(f'[red]{decode_stdout(result.stdout)}')
+            print(f'[red]{decode_stdout(result.stderr)}')
             break

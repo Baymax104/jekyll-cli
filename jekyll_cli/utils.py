@@ -65,3 +65,10 @@ def split_filename(filename: str) -> Tuple[str, str] | None:
         return None
     parts = re.match(r'(\d{4}-\d{2}-\d{2})-(.+)', filename)
     return parts.group(1), parts.group(2)
+
+
+def decode_stdout(output):
+    try:
+        return output.decode('utf-8')
+    except UnicodeDecodeError:
+        return output.decode('gbk')
