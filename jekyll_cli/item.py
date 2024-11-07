@@ -17,15 +17,17 @@ class Item:
         self,
         name: str,
         type_: BlogType,
+        root: Path,
+        mode: str,
         path: Path | None = None,
         file_path: Path | None = None,
-        root: Path = Path(),
-        mode: str = 'single'
     ):
         self.name = name
         self.__type = type_
         self.__root = root
         self.__mode = mode
+        assert root is not None
+        assert mode in ['single', 'item']
         self.__parent_dir = self.__root / type_.value
         self.__path = path
         self.__file_path = file_path
