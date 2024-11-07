@@ -3,17 +3,12 @@ import os
 import re
 import shutil
 import time
-from enum import Enum
 from pathlib import Path
 from typing import Dict, Any, Literal
 
 from .config import Config
+from .enums import BlogType
 from .utils import read_markdown, write_markdown, split_filename
-
-
-class BlogType(Enum):
-    Post = '_posts'
-    Draft = '_drafts'
 
 
 class Item:

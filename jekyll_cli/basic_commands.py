@@ -7,7 +7,8 @@ from typer import Typer, Option, Argument
 from .blog import Blog
 from .config import Config
 from .config_commands import app as config_app
-from .item import Item, BlogType
+from .enums import BlogType
+from .item import Item
 from .prompt import *
 from .utils import complete_items
 

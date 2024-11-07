@@ -3,7 +3,8 @@ from fnmatch import fnmatch
 from typing import List, Dict
 
 from .config import Config
-from .item import Item, BlogType
+from .enums import BlogType
+from .item import Item
 from .utils import path_filter, split_filename
 
 
