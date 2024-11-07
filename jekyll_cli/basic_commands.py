@@ -129,10 +129,9 @@ def draft(
         return
     item.create(title, class_, tag)
     print(f'[bold]"{item.file_path}" created successfully.')
-    if not editor:
-        editor = Config.select('default.editor')
-    print('Opening draft...')
-    item.open(editor=editor)
+    if editor:
+        print('Opening draft...')
+        item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')
@@ -150,10 +149,9 @@ def post(
         return
     item.create(title, class_, tag)
     print(f'[bold]"{item.file_path}" created successfully.')
-    if not editor:
-        editor = Config.select('default.editor')
-    print('Opening post...')
-    item.open(editor=editor)
+    if editor:
+        print('Opening post...')
+        item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')
