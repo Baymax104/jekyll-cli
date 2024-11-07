@@ -13,19 +13,40 @@ from .utils import read_markdown, write_markdown, split_filename
 
 class Item:
 
-    def __init__(self, name: str, type_: BlogType, path: Path | None = None, file_path: Path | None = None):
+    def __init__(
+        self,
+        name: str,
+        type_: BlogType,
+        path: Path | None = None,
+        file_path: Path | None = None,
+        root: Path = Path(),
+        mode: str = 'single'
+    ):
         self.name = name
         self.__type = type_
-        self.__root = Config.root
-        self.__mode = Config.mode
-        # _posts or _drafts
-        self.__parent_dir = self.__root / type_.value if self.__root is not None else None
+        self.__root = root
+        self.__mode = mode
+        self.__parent_dir = self.__root / type_.value
         self.__path = path
         self.__file_path = file_path
+
 
     @property
     def type(self):
         return self.__type
+
+
+    @property
+    def path(self) -> Path | None:
+        r"""
+        Return the pathlib.Path of item
+
+        - 'single' mode: the method returns the entire Path of markdown file.
+        - 'item' mode: the method returns the entire Path of the item directory.
+        :return: the pathlib.Path object or None
+        """
+        return self.__path
+
 
     @property
     def file_path(self) -> Path | None:
@@ -46,36 +67,11 @@ class Item:
             return None
 
         # find .md file for item mode
-        pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}\.md$' if self.type == BlogType.Post else rf'^{self.name}\.md$'
-        matched = [f for f in self.path.iterdir() if re.match(pattern, f.name) and f.is_file()]
+        pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}$' if self.type == BlogType.Post else self.name
+        matched = [f for f in self.path.iterdir() if re.match(pattern, f.stem) and f.is_file()]
         self.__file_path = matched[0] if len(matched) > 0 else None
         return self.__file_path
 
-    @property
-    def path(self) -> Path | None:
-        r"""
-        Return the pathlib.Path of item
-
-        - 'single' mode: the method returns the entire Path of markdown file.
-        - 'item' mode: the method returns the entire Path of the item directory.
-        :return: the pathlib.Path object or None
-        """
-        if self.__path is not None:
-            return self.__path
-
-        item_path: Path | None = None
-        for path in self.__parent_dir.iterdir():
-            if Config.mode == 'single':
-                pattern = rf'^\d{{4}}-\d{{2}}-\d{{2}}-{self.name}.md$' if self.type == BlogType.Post else rf'^{self.name}.md$'
-                is_type_valid = path.is_file()
-            else:
-                pattern = rf'^{self.name}$'
-                is_type_valid = path.is_dir()
-            if re.match(pattern, path.name) and is_type_valid:
-                item_path = path
-                break
-        self.__path = item_path
-        return self.__path
 
     def create(self, title: str = None, class_: list[str] = None, tag: list[str] = None):
         # create item directories
@@ -105,9 +101,18 @@ class Item:
             formatter['tags'] = tag
         write_markdown(file_path, formatter)
 
+        if self.__mode == 'single':
+            self.__path = file_path
+            self.__file_path = file_path
+        else:
+            self.__path = file_path.parent
+            self.__file_path = file_path
+
+
     def open(self, editor=None):
         if self.file_path:
             os.system(f'{editor if editor else "start"} {self.file_path}')
+
 
     def remove(self):
         if not self.path:
@@ -116,6 +121,7 @@ class Item:
             self.path.unlink()
         else:
             shutil.rmtree(self.path)
+
 
     def publish(self):
         if self.type != BlogType.Draft:
@@ -136,6 +142,7 @@ class Item:
         formatter['date'] = time.strftime("%Y-%m-%d %H:%M")
         write_markdown(dest_file_path, formatter, article)
         self.__type = BlogType.Post
+
 
     def unpublish(self):
         if self.type != BlogType.Post:
@@ -158,6 +165,7 @@ class Item:
         write_markdown(dest_file_path, formatter, article)
         self.__type = BlogType.Draft
 
+
     def info(self) -> Dict[str, Any]:
         formatter, _ = read_markdown(self.file_path)
         infos = {
@@ -168,6 +176,7 @@ class Item:
         }
         infos = dict(infos, **formatter)
         return infos
+
 
     def rename(self, new_name: str):
         if self.path is None or self.file_path is None:
@@ -181,6 +190,7 @@ class Item:
         else:
             self.__path = self.__file_path
 
+
     def __move_item(self, dest: Literal['_posts', '_drafts']):
         src_parent_dir = self.__parent_dir
         src_path = self.path
@@ -193,8 +203,10 @@ class Item:
         self.__path = dest_path
         return dest_file_path
 
+
     def __str__(self):
         return self.name
+
 
     def __iter__(self):
         yield from {

@@ -123,7 +123,11 @@ def draft(
     editor: Annotated[str, Option('--editor', '-e', help='Open draft in given editor.')] = None
 ):
     """Create a draft."""
-    item = Item(name, BlogType.Draft)
+    if Config.root is None:
+        print('[bold red]No blog root. Use "blog init" to initialize the blog.')
+        return
+
+    item = Item(name, BlogType.Draft, root=Config.root, mode=Config.mode)
     if item in Blog:
         print(f'[bold red]Draft "{item.name}" already exists.')
         return
@@ -143,7 +147,11 @@ def post(
     editor: Annotated[str, Option('--editor', '-e', help='Open post in given editor.')] = None
 ):
     """Create a post."""
-    item = Item(name, BlogType.Post)
+    if Config.root is None:
+        print('[bold red]No blog root. Use "blog init" to initialize the blog.')
+        return
+
+    item = Item(name, BlogType.Post, root=Config.root, mode=Config.mode)
     if item in Blog:
         print(f'[bold red]Post "{item.name}" already exists.')
         return

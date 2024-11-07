@@ -5,7 +5,7 @@ from typing import List, Dict
 from .config import Config
 from .enums import BlogType
 from .item import Item
-from .utils import path_filter, split_filename
+from .utils import filter_path, split_filename
 
 
 class __Blog:
@@ -16,17 +16,21 @@ class __Blog:
         self.__root = Config.root
         self.__mode = Config.mode
 
+
     @property
     def posts(self) -> List[Item]:
         return list(self.__posts_dict.values())
+
 
     @property
     def drafts(self) -> List[Item]:
         return list(self.__drafts_dict.values())
 
+
     @property
     def articles(self) -> List[Item]:
         return self.posts + self.drafts
+
 
     @property
     def __posts_dict(self) -> Dict[str, Item]:
@@ -34,11 +38,13 @@ class __Blog:
             self.__post_items = self.__initialize_items(BlogType.Post)
         return self.__post_items
 
+
     @property
     def __drafts_dict(self) -> Dict[str, Item]:
         if self.__draft_items is None:
             self.__draft_items = self.__initialize_items(BlogType.Draft)
         return self.__draft_items
+
 
     def find(self, pattern: str, subset: BlogType | None = None) -> List[Item]:
         match subset:
@@ -57,6 +63,7 @@ class __Blog:
         # fuzzy matching
         return [item for name, item in items.items() if fnmatch(name, f'*{pattern}*')]
 
+
     def __initialize_items(self, type_: BlogType) -> Dict[str, Item]:
         if self.__root is None:
             return {}
@@ -65,10 +72,13 @@ class __Blog:
             raise ValueError(f'{parent_dir} is not a directory.')
 
         items = {}
-        for item_path in [f for f in parent_dir.iterdir() if path_filter(Config.mode, f)]:
-            name = split_filename(item_path.stem)[1] if Config.mode == 'single' else item_path.stem
-            items[name] = Item(name, type_, item_path)
+        for item_path in [f for f in parent_dir.iterdir() if filter_path(self.__mode, f)]:
+            name = item_path.stem
+            if self.__mode == 'single' and type_ == BlogType.Post:
+                name = split_filename(item_path.stem)[1]
+            items[name] = Item(name, type_, item_path, root=self.__root, mode=self.__mode)
         return items
+
 
     def __contains__(self, item: Item) -> bool:
         return item.name in (self.__posts_dict if item.type == BlogType.Post else self.__drafts_dict)

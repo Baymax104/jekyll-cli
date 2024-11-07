@@ -3,9 +3,8 @@ from typing import Annotated, Any
 
 from typer import Typer, Argument
 
-from .prompt import print_config
 from .config import Config
-from .prompt import print
+from .prompt import print_config, print
 from .utils import convert_literal, check_configuration
 
 app = Typer(

@@ -31,6 +31,7 @@ class __Config:
         }
     }
 
+
     def __init__(self):
         app_home = Path().home() / '.jekyll-cli'
         self.__config_path = app_home / 'config.yml'
@@ -48,6 +49,7 @@ class __Config:
             # read config
             self.__config = OC.load(self.__config_path)
 
+
     @property
     def root(self) -> Path | None:
         if self.__root is not None:
@@ -62,6 +64,7 @@ class __Config:
         self.__root = root
         return self.__root
 
+
     @property
     def mode(self) -> str:
         if self.__mode is not None:
@@ -75,12 +78,15 @@ class __Config:
         self.__mode = mode
         return self.__mode
 
+
     def get_formatter(self, type_: str) -> Dict[str, Any]:
         formatter = self.select(f'default.{type_.lower()}', default={})
         return OC.to_container(formatter, resolve=True)
 
+
     def select(self, key, default=None) -> Any | None:
         return OC.select(self.__config, key, default=default)
+
 
     def update(self, key, value):
         OC.update(self.__config, key, value, merge=False)
@@ -90,17 +96,21 @@ class __Config:
             self.__mode = value
         OC.save(self.__config, self.__config_path)
 
+
     def merge(self, config: Dict):
         other_config = OC.create(config)
         self.__config = OC.unsafe_merge(self.__config, other_config)
         OC.save(self.__config, self.__config_path)
 
+
     def reset(self):
         self.__config = OC.create(self.__DEFAULT_CONFIG__)
         OC.save(self.__config, self.__config_path)
 
+
     def to_dict(self) -> Dict[str, Any]:
         return OC.to_container(self.__config, resolve=True)
+
 
     def __str__(self):
         return OC.to_yaml(self.__config)
