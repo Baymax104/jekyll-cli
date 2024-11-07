@@ -2,7 +2,8 @@
 import os
 from typing import Annotated
 
-from typer import Typer, Option, Argument
+import typer
+from typer import Typer, Option, Argument, Context
 
 from .blog import Blog
 from .config import Config
@@ -27,8 +28,7 @@ def serve(
     port: Annotated[int, Option(help='Listen on the given port.')] = Config.select('deploy.port')
 ):
     """Start blog server locally through jekyll."""
-    if Config.root is not None:
-        os.chdir(Config.root)
+    os.chdir(Config.root)
     command = 'bundle exec jekyll serve'
     # draft option
     if draft:
@@ -41,8 +41,7 @@ def serve(
 @app.command(rich_help_panel='Deployment')
 def build(draft: Annotated[bool, Option(help='Build including drafts.')] = Config.select('deploy.draft')):
     """Build jekyll site."""
-    if Config.root is not None:
-        os.chdir(Config.root)
+    os.chdir(Config.root)
     command = 'bundle exec jekyll build'
     if draft:
         command += ' --drafts'
@@ -123,11 +122,7 @@ def draft(
     editor: Annotated[str, Option('--editor', '-e', help='Open draft in given editor.')] = None
 ):
     """Create a draft."""
-    if Config.root is None:
-        print('[red]No blog root. Use "blog init" to initialize the blog.')
-        return
-
-    item = Item(name, BlogType.Draft, root=Config.root, mode=Config.mode)
+    item = Item(name, BlogType.Draft)
     if item in Blog:
         print(f'[red]Draft "{item.name}" already exists.')
         return
@@ -147,11 +142,7 @@ def post(
     editor: Annotated[str, Option('--editor', '-e', help='Open post in given editor.')] = None
 ):
     """Create a post."""
-    if Config.root is None:
-        print('[red]No blog root. Use "blog init" to initialize the blog.')
-        return
-
-    item = Item(name, BlogType.Post, root=Config.root, mode=Config.mode)
+    item = Item(name, BlogType.Post)
     if item in Blog:
         print(f'[red]Post "{item.name}" already exists.')
         return
@@ -267,3 +258,11 @@ def rename(
     old_path = item.path
     item.rename(new_name)
     print(f'Renamed "{old_path}" to "{item.path}" successfully.')
+
+
+@app.callback()
+def check(context: Context):
+    if context.invoked_subcommand != 'init' and context.invoked_subcommand != 'config':
+        if Config.root is None:
+            print('[red]No blog root. Use "blog init" to initialize the blog.')
+            raise typer.Exit(code=1)

@@ -13,21 +13,12 @@ from .utils import read_markdown, write_markdown, split_filename
 
 class Item:
 
-    def __init__(
-        self,
-        name: str,
-        type_: BlogType,
-        root: Path,
-        mode: str,
-        path: Path | None = None,
-        file_path: Path | None = None,
-    ):
+    def __init__(self, name: str, type_: BlogType, path: Path | None = None, file_path: Path | None = None):
+        self.__root = Config.root
+        self.__mode = Config.mode
+        assert self.__root is not None and self.__mode in ['single', 'item']
         self.name = name
         self.__type = type_
-        self.__root = root
-        self.__mode = mode
-        assert root is not None
-        assert mode in ['single', 'item']
         self.__parent_dir = self.__root / type_.value
         self.__path = path
         self.__file_path = file_path
@@ -112,13 +103,14 @@ class Item:
 
 
     def open(self, editor=None):
-        if self.file_path:
-            os.system(f'{editor if editor else "start"} {self.file_path}')
+        if not self.file_path:
+            raise ValueError('File path is null.')
+        os.system(f'{editor if editor else "start"} {self.file_path}')
 
 
     def remove(self):
         if not self.path:
-            return
+            raise ValueError('Item path is null.')
         if self.__mode == 'single':
             self.path.unlink()
         else:
@@ -127,12 +119,12 @@ class Item:
 
     def publish(self):
         if self.type != BlogType.Draft:
-            return
+            raise ValueError('The item is not a draft.')
 
         if self.path is None or self.file_path is None:
             raise ValueError('Item path or file path is null.')
 
-        dest_file_path = self.__move_item('_posts')
+        self.__parent_dir, self.__path, dest_file_path = self.__move_item('_posts')
 
         # rename .md file
         post_filename = f'{time.strftime("%Y-%m-%d")}-{dest_file_path.name}'
@@ -148,12 +140,12 @@ class Item:
 
     def unpublish(self):
         if self.type != BlogType.Post:
-            return
+            raise ValueError('The item is not a post.')
 
         if self.path is None or self.file_path is None:
             raise ValueError('Item path or file path is null.')
 
-        dest_file_path = self.__move_item('_drafts')
+        self.__parent_dir, self.__path, dest_file_path = self.__move_item('_drafts')
 
         # rename .md file
         draft_filename = dest_file_path.name.split('-', 3)[3]
@@ -194,16 +186,11 @@ class Item:
 
 
     def __move_item(self, dest: Literal['_posts', '_drafts']):
-        src_parent_dir = self.__parent_dir
-        src_path = self.path
-        src_file_path = self.file_path
         dest_parent_dir = self.__parent_dir.parent / dest
-        dest_path = dest_parent_dir / src_path.relative_to(src_parent_dir)
-        dest_file_path = dest_parent_dir / src_file_path.relative_to(src_parent_dir)
-        shutil.move(src_path, dest_path)
-        self.__parent_dir = dest_parent_dir
-        self.__path = dest_path
-        return dest_file_path
+        dest_path = dest_parent_dir / self.path.relative_to(self.__parent_dir)
+        dest_file_path = dest_parent_dir / self.file_path.relative_to(self.__parent_dir)
+        shutil.move(self.path, dest_path)
+        return dest_parent_dir, dest_path, dest_file_path
 
 
     def __str__(self):
