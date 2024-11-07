@@ -61,8 +61,7 @@ def info(name: Annotated[str, Argument(help='Name of post or draft.', autocomple
         message=f'Found {len(items)} matches, select one to check:',
         choices={f'[{item.type.name}] {item.name}': item for item in items}
     )
-    rule('[bold green]Info')
-    print_info(item.info())
+    print_info(item.info(), title='[bold green]Info', show_header=False)
 
 
 @app.command(name='list', rich_help_panel='Operation')
@@ -233,7 +232,7 @@ def init():
 
     rule()
     print('You have entered the following configurations:')
-    print_info({'Blog root path': str(root), 'Management mode': mode})
+    print_info({'Blog root path': str(root), 'Management mode': mode}, show_header=False)
 
     if confirm('Confirm your basic configurations?', default=True):
         Config.merge({'root': str(root), 'mode': mode})

@@ -32,8 +32,8 @@ def print_table(items: List[Any], **table_config):
     print(table)
 
 
-def print_info(info: Dict[str, Any]):
-    table = Table(show_header=False)
+def print_info(info: Dict[str, Any], **table_config):
+    table = Table(**table_config)
     table.add_column()
     table.add_column()
     for key, value in info.items():
