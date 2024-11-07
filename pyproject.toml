@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jekyll-cli"
-version = "1.0.9"
+version = "1.0.10"
 description = "Jekyll Blog CLI Tool"
 authors = ["Baymax104 <wzy1048168235@163.com>"]
 license = "MIT"
