@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import os
+import subprocess
 from typing import Annotated
 
 import typer
@@ -22,30 +23,38 @@ app = Typer(
 app.add_typer(config_app, rich_help_panel='Configuration')
 
 
-@app.command(rich_help_panel='Deployment')
+@app.callback()
+def check(context: Context):
+    if context.invoked_subcommand != 'init' and context.invoked_subcommand != 'config':
+        if Config.root is None:
+            print('[red]No blog root. Use "blog init" to initialize the blog.')
+            raise typer.Exit(code=1)
+
+
+@app.command(rich_help_panel='Generation')
 def serve(
-    draft: Annotated[bool, Option(help='Start blog server with drafts.')] = Config.select('deploy.draft'),
-    port: Annotated[int, Option(help='Listen on the given port.')] = Config.select('deploy.port')
+    draft: Annotated[bool, Option(help='Start blog server with drafts.')] = Config.select('generate.draft'),
+    port: Annotated[int, Option(help='Listen on the given port.')] = Config.select('generate.port')
 ):
     """Start blog server locally through jekyll."""
     os.chdir(Config.root)
-    command = 'bundle exec jekyll serve'
+    command = ['bundle', 'exec', 'jekyll', 'serve']
     # draft option
     if draft:
-        command += ' --drafts'
+        command.append('--drafts')
     if port is not None:
-        command += f' --port {port}'
-    os.system(command)
+        command.append(f'--port {port}')
+    subprocess.run(command, shell=True)
 
 
-@app.command(rich_help_panel='Deployment')
-def build(draft: Annotated[bool, Option(help='Build including drafts.')] = Config.select('deploy.draft')):
+@app.command(rich_help_panel='Generation')
+def build(draft: Annotated[bool, Option(help='Build including drafts.')] = Config.select('generate.draft')):
     """Build jekyll site."""
     os.chdir(Config.root)
-    command = 'bundle exec jekyll build'
+    command = ['bundle', 'exec', 'jekyll', 'build']
     if draft:
-        command += ' --drafts'
-    os.system(command)
+        command.append('--drafts')
+    subprocess.run(command, shell=True)
 
 
 @app.command(rich_help_panel='Operation')
@@ -233,7 +242,13 @@ def init():
 
     if confirm('Confirm your basic configurations?', default=True):
         Config.merge({'root': str(root), 'mode': mode})
+        Config.init_deploy()
         print('[bold green]Basic configuration set up successfully!')
+        print('Generate config files:')
+        print_info({
+            'Blog configuration': str(Config.config_path),
+            'Deploy configuration': str(Config.deploy_path),
+        }, show_header=False)
         print('Type "--help" for more information.')
     else:
         print('[red]Aborted.')
@@ -260,9 +275,14 @@ def rename(
     print(f'Renamed "{old_path}" to "{item.path}" successfully.')
 
 
-@app.callback()
-def check(context: Context):
-    if context.invoked_subcommand != 'init' and context.invoked_subcommand != 'config':
-        if Config.root is None:
-            print('[red]No blog root. Use "blog init" to initialize the blog.')
-            raise typer.Exit(code=1)
+@app.command(rich_help_panel='Generation')
+def deploy():
+    """Deploy the site with the '<root>/jekyll-deploy.sh.'"""
+    deploy_path = Config.root / 'jekyll-deploy.yml'
+    if not deploy_path.exists():
+        print('[red]No deploy configuration found.')
+        return
+
+    steps = Config.select('deploy.steps', deploy=True)
+    for step in steps:
+        print(step)
