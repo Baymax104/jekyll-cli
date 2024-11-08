@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
-import os
 import re
 import shutil
+import subprocess
 import time
 from pathlib import Path
 from typing import Dict, Any, Literal
@@ -105,7 +105,8 @@ class Item:
     def open(self, editor=None):
         if not self.file_path:
             raise ValueError('File path is null.')
-        os.system(f'{editor if editor else "start"} {self.file_path}')
+        command = ['cmd.exe', '/c', 'start', editor if editor else '', self.file_path]
+        subprocess.run(command)
 
 
     def remove(self):

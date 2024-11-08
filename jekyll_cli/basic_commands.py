@@ -128,7 +128,8 @@ def draft(
     title: Annotated[str, Option('--title', '-t', help='Title of draft.')] = None,
     class_: Annotated[List[str], Option('--class', '-c', help='Categories of draft.')] = None,
     tag: Annotated[List[str], Option('--tag', '-g', help='Tags of draft.')] = None,
-    editor: Annotated[str, Option('--editor', '-e', help='Open draft in given editor.')] = None
+    editor: Annotated[str, Option('--editor', '-e', help='Open draft in given editor.')] = None,
+    open_: Annotated[bool, Option('--open', '-o', help='Open draft automatically.')] = False,
 ):
     """Create a draft."""
     item = Item(name, BlogType.Draft)
@@ -140,6 +141,10 @@ def draft(
     if editor:
         print('Opening draft...')
         item.open(editor=editor)
+    elif open_:
+        editor = Config.select('default.editor')
+        print('Opening post...')
+        item.open(editor=editor)
 
 
 @app.command(rich_help_panel='Operation')
@@ -148,7 +153,8 @@ def post(
     title: Annotated[str, Option('--title', '-t', help='Title of post.')] = None,
     class_: Annotated[List[str], Option('--class', '-c', help='Categories of post.')] = None,
     tag: Annotated[List[str], Option('--tag', '-g', help='Tags of post.')] = None,
-    editor: Annotated[str, Option('--editor', '-e', help='Open post in given editor.')] = None
+    editor: Annotated[str, Option('--editor', '-e', help='Open post in given editor.')] = None,
+    open_: Annotated[bool, Option('--open', '-o', help='Open post automatically.')] = False,
 ):
     """Create a post."""
     item = Item(name, BlogType.Post)
@@ -158,6 +164,10 @@ def post(
     item.create(title, class_, tag)
     print(f'"{item.file_path}" created successfully.')
     if editor:
+        print('Opening post...')
+        item.open(editor=editor)
+    elif open_:
+        editor = Config.select('default.editor')
         print('Opening post...')
         item.open(editor=editor)
 
