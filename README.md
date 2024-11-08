@@ -145,6 +145,7 @@ $ blog draft [OPTIONS] NAME
 * `-c, --class TEXT`: Categories of draft.
 * `-g, --tag TEXT`: Tags of draft.
 * `-e, --editor TEXT`: Open draft in given editor.
+* `-o, --open`: Open draft automatically.
 * `--help`: Show this message and exit.
 
 ## `blog info`
@@ -238,6 +239,7 @@ $ blog post [OPTIONS] NAME
 * `-c, --class TEXT`: Categories of post.
 * `-g, --tag TEXT`: Tags of post.
 * `-e, --editor TEXT`: Open post in given editor.
+* `-o, --open`: Open post automatically.
 * `--help`: Show this message and exit.
 
 ## `blog publish`
