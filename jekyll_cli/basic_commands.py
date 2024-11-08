@@ -24,7 +24,7 @@ app.add_typer(config_app, rich_help_panel='Configuration')
 
 
 @app.callback()
-def check(context: Context):
+def check_typer(context: Context):
     if context.invoked_subcommand != 'init' and context.invoked_subcommand != 'config':
         if Config.root is None:
             print('[red]No blog root. Use "blog init" to initialize the blog.')

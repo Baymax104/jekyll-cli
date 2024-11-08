@@ -17,7 +17,7 @@ app = Typer(
 
 
 @app.callback()
-def check(context: Context):
+def check_typer(context: Context):
     if context.invoked_subcommand != 'list':
         if Config.root is None:
             print('[red]No blog root. Use "blog init" to initialize the blog.')
