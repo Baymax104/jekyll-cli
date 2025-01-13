@@ -13,13 +13,19 @@ from .utils import read_markdown, write_markdown, split_filename
 
 class Item:
 
-    def __init__(self, name: str, type_: BlogType, path: Path | None = None, file_path: Path | None = None):
-        self.__root = Config.root
-        self.__mode = Config.mode
-        assert self.__root is not None and self.__mode in ['single', 'item']
+    def __init__(
+        self,
+        name: str,
+        type_: BlogType,
+        mode: str,
+        parent_dir: Path,
+        path: Path | None = None,
+        file_path: Path | None = None
+    ):
+        self.__mode = mode
         self.name = name
         self.__type = type_
-        self.__parent_dir = self.__root / type_.value
+        self.__parent_dir = parent_dir
         self.__path = path
         self.__file_path = file_path
 

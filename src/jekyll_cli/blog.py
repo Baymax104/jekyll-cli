@@ -76,7 +76,7 @@ class __Blog:
             name = item_path.stem
             if self.__mode == 'single' and type_ == BlogType.Post:
                 name = split_filename(item_path.stem)[1]
-            items[name] = Item(name, type_, item_path)
+            items[name] = Item(name, type_, self.__mode, self.__root / type_.value, path=item_path)
         return items
 
 

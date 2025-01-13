@@ -29,6 +29,9 @@ def check_typer(context: Context):
         if Config.root is None:
             print('[red]No blog root. Use "blog init" to initialize the blog.')
             raise typer.Exit(code=1)
+        if Config.mode is None or Config.mode not in ['single', 'item']:
+            print('[red]Unexpected value of mode.')
+            raise typer.Exit(code=1)
 
 
 @app.command(rich_help_panel='Generation')
@@ -132,7 +135,7 @@ def draft(
     open_: Annotated[bool, Option('--open', '-o', help='Open draft automatically.')] = False,
 ):
     """Create a draft."""
-    item = Item(name, BlogType.Draft)
+    item = Item(name, BlogType.Draft, Config.mode, Config.root / BlogType.Draft.value)
     if item in Blog:
         print(f'[red]Draft "{item.name}" already exists.')
         return
@@ -157,7 +160,7 @@ def post(
     open_: Annotated[bool, Option('--open', '-o', help='Open post automatically.')] = False,
 ):
     """Create a post."""
-    item = Item(name, BlogType.Post)
+    item = Item(name, BlogType.Post, Config.mode, Config.root / BlogType.Post.value)
     if item in Blog:
         print(f'[red]Post "{item.name}" already exists.')
         return
@@ -258,11 +261,6 @@ def init():
     if confirm('Confirm your configurations?', default=True):
         Config.init(root, mode, deploy)
         print('[bold green]Basic configuration set up successfully!')
-        print('Generate config files:')
-        print_info({
-            'Blog configuration': str(Config.config_path),
-            'Deploy configuration': str(Config.deploy_path),
-        }, show_header=False)
         print('Type "--help" for more information.')
     else:
         print('[red]Aborted.')
@@ -292,9 +290,9 @@ def rename(
 @app.command(rich_help_panel='Generation')
 def deploy():
     """Deploy the site with the '<root>/jekyll-deploy.yml.'"""
-    steps = Config.select('deploy.steps')
+    steps = Config.select('steps', prefix='deploy')
     if steps is None:
-        print('[red]No deploy configuration found.')
+        print('[red]No deploy steps found.')
         return
 
     os.chdir(Config.root)

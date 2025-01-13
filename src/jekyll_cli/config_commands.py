@@ -22,6 +22,9 @@ def check_typer(context: Context):
         if Config.root is None:
             print('[red]No blog root. Use "blog init" to initialize the blog.')
             raise typer.Exit(code=1)
+        if Config.mode is None or Config.mode not in ['single', 'item']:
+            print('[red]Unexpected value of mode.')
+            raise typer.Exit(code=1)
 
 
 @app.command(name='list')
@@ -36,9 +39,12 @@ def set_config(
     value: Annotated[Any, Argument(help='Configuration value.', parser=convert_literal)],
 ):
     """Set a configuration."""
-    check_configuration(key, value)
-    Config.update(key, value)
-    print(f'Configuration "{key}" updated to "{value}" successfully.')
+    try:
+        check_configuration(key, value)
+        Config.update(key, value)
+        print(f'Configuration "{key}" updated to "{value}" successfully.')
+    except Exception as e:
+        print(f'[red]{e}')
 
 
 @app.command()
