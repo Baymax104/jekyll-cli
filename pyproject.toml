@@ -1,6 +1,6 @@
 [project]
 name = "jekyll-cli"
-version = "1.2.0"
+version = "1.2.1"
 description = "Jekyll Blog CLI Tool"
 readme = "README.md"
 license = "MIT"

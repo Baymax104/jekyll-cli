@@ -46,7 +46,7 @@ def serve(
     if draft:
         command.append('--drafts')
     if port is not None:
-        command.append(f'--port {port}')
+        command.extend(['--port', str(port)])
     subprocess.run(command, shell=True)
 
 
